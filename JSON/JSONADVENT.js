@@ -181,6 +181,15 @@ function ordenarYFiltrar() {
   const criterio = ordenarSelect.value;
   const cards = Array.from(gallery.querySelectorAll('.image-card'));
 
+  if (!criterio) {
+    cards.forEach(card => {
+      card.style.display = 'block';
+      const label = card.querySelector('.metadata-label');
+      if(label) label.remove();
+    });
+    return;
+  }
+
   if (criterio === 'numero' || criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
     cards.sort((a, b) => {
       const valA = getMetadataValue(a, criterio);
@@ -189,18 +198,42 @@ function ordenarYFiltrar() {
       if (valA > valB) return 1;
       return 0;
     });
+
     cards.forEach(card => {
-      card.style.display = 'block';
+      const val = getMetadataValue(card, criterio);
+      if (val === '' || val === null || val === 0 || val === false || val === undefined) {
+        card.style.display = 'none';
+        const label = card.querySelector('.metadata-label');
+        if(label) label.remove();
+      } else {
+        card.style.display = 'block';
+
+        let label = card.querySelector('.metadata-label');
+        if (!label) {
+          label = document.createElement('span');
+          label.classList.add('metadata-label');
+          card.appendChild(label);
+        }
+        let texto = '';
+        if (criterio === 'anio') texto = val.toString();
+        else if (criterio === 'fecha') texto = new Date(val).toISOString().slice(0,10);
+        else texto = val.toString();
+        label.textContent = texto;
+      }
       gallery.appendChild(card);
     });
   } else if (criterio === 'Terror' || criterio === 'Ciencia Ficción' || criterio === 'Oscuras') {
     cards.forEach(card => {
       const tieneCategoria = getMetadataValue(card, criterio);
       card.style.display = tieneCategoria ? 'block' : 'none';
+      const label = card.querySelector('.metadata-label');
+      if(label) label.remove();
     });
   } else {
     cards.forEach(card => {
       card.style.display = 'block';
+      const label = card.querySelector('.metadata-label');
+      if(label) label.remove();
     });
   }
 }
