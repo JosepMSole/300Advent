@@ -19,8 +19,7 @@
 <h2>Editar metadata de imágenes</h2>
 
 <form id="formMetadata">
-  <label>ID imagen (ej. 001): <input type="text" id="id" required pattern="\d{3}" title="Introduce un número de 3 dígitos, ejemplo: 001" />
-
+  <label>ID imagen (ej. 001): <input type="text" id="id" required pattern="\d{3}" title="Introduce un número de 3 dígitos, ejemplo: 001" /></label>
   
   <label>Categorías (selecciona una o más): 
     <select id="categorias" multiple size="3" required>
@@ -30,11 +29,12 @@
     </select>
   </label>
   
-  <label>Año: <input type="number" id="anio" min="1900" max="3500" /></label>
+  <label>Año: <input type="number" id="anio" min="-300000" max="3500" step="1" /></label>
   <label>Fecha publicación (YYYY-MM-DD): <input type="date" id="fecha" /></label>
   <label>Título: <input type="text" id="titulo" /></label>
   <button type="submit">Guardar metadata</button>
 </form>
+
 
 <div class="mensaje" id="mensaje"></div>
 
