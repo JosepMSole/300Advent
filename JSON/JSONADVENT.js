@@ -4,62 +4,161 @@ const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
 const ordenarSelect = document.getElementById("ordenarPor");
 
-function cargarMetadataGaleria() {
-  const data = localStorage.getItem("metadataGaleria");
-  return data ? JSON.parse(data) : {};
-}
+// Esperamos que DOM esté listo
+window.addEventListener("DOMContentLoaded", () => {
 
-function formatNumber(n) {
-  return String(n).padStart(3, "0");
-}
-
-const imageDivs = [];
-let disponibles = 0;
-
-const metadata = cargarMetadataGaleria();
-
-for (let i = 1; i <= totalImagenes; i++) {
-  const numero = formatNumber(i);
-  const imgPath = `imagenes/${numero}.jpg`;
-
-  const div = document.createElement("div");
-  div.classList.add("image-card");
-  div.style.animationDelay = `${i * 5}ms`;
-
-  if (metadata[numero]) {
-    const meta = metadata[numero];
-    div.dataset.categorias = meta.categorias ? meta.categorias.join(",") : "";
-    div.dataset.anio = meta.anio || "";
-    div.dataset.fecha = meta.fecha || "";
-    div.dataset.titulo = meta.titulo || "";
-    div.title = meta.titulo || "";
+  // Carga metadata desde localStorage
+  function cargarMetadataGaleria() {
+    const data = localStorage.getItem("metadataGaleria");
+    return data ? JSON.parse(data) : {};
   }
 
-  const label = document.createElement("span");
-  label.textContent = numero;
-  div.appendChild(label);
+  function formatNumber(n) {
+    return String(n).padStart(3, "0");
+  }
 
-  const img = new Image();
-  img.src = imgPath;
+  const imageDivs = [];
+  let disponibles = 0;
 
-  let desbloqueada = false;
+  const metadata = cargarMetadataGaleria();
 
-  img.onload = () => {
-    disponibles++;
-    updateContador();
-    div.appendChild(img);
+  // Limpiar gallery (por si se recarga)
+  gallery.innerHTML = '';
 
-    imageDivs.push({
-      div,
-      img,
-      desbloqueadaRef: () => desbloqueada,
-      setDesbloqueada: () => {
-        desbloqueada = true;
-      },
-    });
+  // Crear cards con metadata
+  for (let i = 1; i <= totalImagenes; i++) {
+    const numero = formatNumber(i);
+    const imgPath = `imagenes/${numero}.jpg`;
 
-    img.addEventListener("click", () => {
-      if (!desbloqueada) {
+    const div = document.createElement("div");
+    div.classList.add("image-card");
+    div.style.animationDelay = `${i * 5}ms`;
+
+    if (metadata[numero]) {
+      const meta = metadata[numero];
+      div.dataset.categorias = meta.categorias ? meta.categorias.join(",") : "";
+      div.dataset.anio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "";
+      div.dataset.fecha = meta.fecha || "";
+      div.dataset.titulo = meta.titulo || "";
+      div.title = meta.titulo || "";
+    } else {
+      div.dataset.categorias = "";
+      div.dataset.anio = "";
+      div.dataset.fecha = "";
+      div.dataset.titulo = "";
+    }
+
+    const label = document.createElement("span");
+    label.textContent = numero;
+    div.appendChild(label);
+
+    const img = new Image();
+    img.src = imgPath;
+
+    let desbloqueada = false;
+
+    img.onload = () => {
+      disponibles++;
+      updateContador();
+      div.appendChild(img);
+
+      imageDivs.push({
+        div,
+        img,
+        desbloqueadaRef: () => desbloqueada,
+        setDesbloqueada: () => {
+          desbloqueada = true;
+        },
+      });
+
+      img.addEventListener("click", () => {
+        if (!desbloqueada) {
+          div.classList.remove("unlocked-glitch");
+          void div.offsetWidth;
+          div.classList.add("unlocked-glitch");
+
+          setTimeout(() => {
+            div.classList.remove("unlocked-glitch");
+            div.classList.add("desbloqueada");
+            desbloqueada = true;
+          }, 600);
+        } else {
+          openModal(img.src);
+        }
+      });
+    };
+
+    img.onerror = () => {
+      div.classList.add("locked");
+    };
+
+    gallery.appendChild(div);
+  }
+
+  function updateContador() {
+    contadorBtn.textContent = `${disponibles} de ${totalImagenes}`;
+  }
+
+  // Modal variables
+  const modal = document.getElementById("modal");
+  const modalImg = document.getElementById("modalImage");
+  const modalLink = document.getElementById("modalLink");
+  const closeModal = document.getElementById("closeModal");
+
+  let modalMetadata = document.querySelector(".modal-metadata");
+  if (!modalMetadata) {
+    modalMetadata = document.createElement("div");
+    modalMetadata.classList.add("modal-metadata");
+    document.querySelector(".modal-wrapper").appendChild(modalMetadata);
+  }
+
+  function openModal(src) {
+    modal.style.display = "flex";
+    modalImg.src = src;
+
+    const numero = src.match(/\/(\d{3})\.jpg$/)?.[1];
+    if (numero) {
+      modalLink.href = `https://www.disturbingstories.com/${numero}.html`;
+      modalLink.style.display = "inline-block";
+    } else {
+      modalLink.style.display = "none";
+    }
+
+    const meta = metadata[numero];
+    if (meta) {
+      let textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
+      let textoAnio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "N/A";
+      let textoFecha = meta.fecha || "N/A";
+      let textoTitulo = meta.titulo || "N/A";
+
+      modalMetadata.innerHTML = `
+        <div><strong>Categorías:</strong> ${textoCategorias}</div>
+        <div><strong>Año:</strong> ${textoAnio}</div>
+        <div><strong>Fecha:</strong> ${textoFecha}</div>
+        <div><strong>Título:</strong> ${textoTitulo}</div>
+      `;
+      modalMetadata.style.display = "block";
+    } else {
+      modalMetadata.style.display = "none";
+      modalMetadata.innerHTML = "";
+    }
+  }
+
+  closeModal.onclick = () => {
+    modal.style.display = "none";
+  };
+
+  window.onclick = (event) => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  modal.style.display = "none";
+
+  desbloquearBtn.addEventListener("click", () => {
+    imageDivs.forEach(({ div, desbloqueadaRef, setDesbloqueada }) => {
+      if (!desbloqueadaRef() && !div.classList.contains("locked")) {
         div.classList.remove("unlocked-glitch");
         void div.offsetWidth;
         div.classList.add("unlocked-glitch");
@@ -67,207 +166,110 @@ for (let i = 1; i <= totalImagenes; i++) {
         setTimeout(() => {
           div.classList.remove("unlocked-glitch");
           div.classList.add("desbloqueada");
-          desbloqueada = true;
+          setDesbloqueada();
         }, 600);
-      } else {
-        openModal(img.src);
       }
     });
-  };
-
-  img.onerror = () => {
-    div.classList.add("locked");
-  };
-
-  gallery.appendChild(div);
-}
-
-function updateContador() {
-  contadorBtn.textContent = `${disponibles} de ${totalImagenes}`;
-}
-
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modalImage");
-const modalLink = document.getElementById("modalLink");
-const closeModal = document.getElementById("closeModal");
-
-let modalMetadata = document.querySelector(".modal-metadata");
-if (!modalMetadata) {
-  modalMetadata = document.createElement("div");
-  modalMetadata.classList.add("modal-metadata");
-  document.querySelector(".modal-wrapper").appendChild(modalMetadata);
-}
-
-function openModal(src) {
-  modal.style.display = "flex";
-  modalImg.src = src;
-
-  const numero = src.match(/\/(\d{3})\.jpg$/)?.[1];
-  if (numero) {
-    modalLink.href = `https://www.disturbingstories.com/${numero}.html`;
-    modalLink.style.display = "inline-block";
-  } else {
-    modalLink.style.display = "none";
-  }
-
-  const meta = metadata[numero];
-  if (meta) {
-    let textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
-    let textoAnio = meta.anio || "N/A";
-    let textoFecha = meta.fecha || "N/A";
-    let textoTitulo = meta.titulo || "N/A";
-
-    modalMetadata.innerHTML = `
-      <div><strong>Categorías:</strong> ${textoCategorias}</div>
-      <div><strong>Año:</strong> ${textoAnio}</div>
-      <div><strong>Fecha:</strong> ${textoFecha}</div>
-      <div><strong>Título:</strong> ${textoTitulo}</div>
-    `;
-    modalMetadata.style.display = "block";
-  } else {
-    modalMetadata.style.display = "none";
-    modalMetadata.innerHTML = "";
-  }
-}
-
-closeModal.onclick = () => {
-  modal.style.display = "none";
-};
-
-window.onclick = (event) => {
-  if (event.target === modal) {
-    modal.style.display = "none";
-  }
-};
-
-window.addEventListener("DOMContentLoaded", () => {
-  modal.style.display = "none";
-});
-
-desbloquearBtn.addEventListener("click", () => {
-  imageDivs.forEach(({ div, desbloqueadaRef, setDesbloqueada }) => {
-    if (!desbloqueadaRef() && !div.classList.contains("locked")) {
-      div.classList.remove("unlocked-glitch");
-      void div.offsetWidth;
-      div.classList.add("unlocked-glitch");
-
-      setTimeout(() => {
-        div.classList.remove("unlocked-glitch");
-        div.classList.add("desbloqueada");
-        setDesbloqueada();
-      }, 600);
-    }
   });
-});
 
-function getMetadataValue(div, criterio) {
-  switch (criterio) {
-    case "numero":
-      return parseInt(div.querySelector("span")?.textContent || "0", 10);
-    case "Terror":
-    case "Ciencia Ficción":
-    case "Oscuras":
-      return div.dataset.categorias
-        ?.split(",")
-        .map((c) => c.trim())
-        .includes(criterio);
-    case "anio":
-      return div.dataset.anio !== "" ? parseInt(div.dataset.anio) : null;
-    case "fecha":
-      return div.dataset.fecha ? new Date(div.dataset.fecha).getTime() : null;
-    case "titulo":
-      return div.dataset.titulo?.toLowerCase() || null;
-    default:
-      return null;
-  }
-}
-
-function ordenarYFiltrar() {
-  const criterio = ordenarSelect.value;
-  const cards = Array.from(gallery.querySelectorAll(".image-card"));
-
-  if (criterio === "numero" || criterio === "titulo") {
-    // Mostrar todas sin etiqueta y sin filtro
-    cards.forEach((card) => {
-      card.style.display = "block";
-      const label = card.querySelector(".metadata-label");
-      if (label) label.style.display = "none";
-    });
-    cards.forEach((card) => gallery.appendChild(card));
-    return;
-  }
-
-  if (criterio === "anio" || criterio === "fecha" || criterio === "titulo") {
-    // Para año, fecha, mostrar sólo con metadata válida y ordenarlas
-    let filtered = cards.filter((card) => {
-      const val = getMetadataValue(card, criterio);
-      return val !== null && val !== "" && val !== false;
-    });
-
-    filtered.sort((a, b) => {
-      const valA = getMetadataValue(a, criterio);
-      const valB = getMetadataValue(b, criterio);
-      if (valA < valB) return -1;
-      if (valA > valB) return 1;
-      return 0;
-    });
-
-    filtered.forEach((card) => {
-      card.style.display = "block";
-      gallery.appendChild(card);
-    });
-
-    cards.forEach((card) => {
-      if (!filtered.includes(card)) card.style.display = "none";
-    });
-  } else if (
-    criterio === "Terror" ||
-    criterio === "Ciencia Ficción" ||
-    criterio === "Oscuras"
-  ) {
-    cards.forEach((card) => {
-      const tieneCategoria = getMetadataValue(card, criterio);
-      card.style.display = tieneCategoria ? "block" : "none";
-    });
-  } else {
-    cards.forEach((card) => {
-      card.style.display = "block";
-    });
-  }
-
-  cards.forEach((card) => {
-    let labelClass = "metadata-label";
-    let label = card.querySelector(`.${labelClass}`);
-
-    if (criterio !== "numero" && criterio !== "titulo") {
-      if (!label) {
-        label = document.createElement("div");
-        label.classList.add(labelClass);
-        card.appendChild(label);
-      }
-      let texto = "";
-      switch (criterio) {
-        case "anio":
-          texto = card.dataset.anio || "";
-          break;
-        case "fecha":
-          texto = card.dataset.fecha || "";
-          break;
-        case "Terror":
-        case "Ciencia Ficción":
-        case "Oscuras":
-          texto = criterio;
-          break;
-        default:
-          texto = "";
-      }
-      label.textContent = texto;
-      label.style.display = texto ? "block" : "none";
-      label.style.textAlign = "left";
-    } else if (label) {
-      label.style.display = "none";
+  function getMetadataValue(div, criterio) {
+    switch (criterio) {
+      case "numero":
+        return parseInt(div.querySelector("span")?.textContent || "0", 10);
+      case "Terror":
+      case "Ciencia Ficción":
+      case "Oscuras":
+        return div.dataset.categorias
+          ?.split(",")
+          .map((c) => c.trim())
+          .includes(criterio);
+      case "anio":
+        return div.dataset.anio !== "" ? parseInt(div.dataset.anio) : null;
+      case "fecha":
+        return div.dataset.fecha ? new Date(div.dataset.fecha).getTime() : null;
+      case "titulo":
+        return div.dataset.titulo ? div.dataset.titulo.toLowerCase() : null;
+      default:
+        return null;
     }
-  });
-}
+  }
 
-ordenarSelect.addEventListener("change", ordenarYFiltrar);
+  function ordenarYFiltrar() {
+    const criterio = ordenarSelect.value;
+    const cards = Array.from(gallery.querySelectorAll(".image-card"));
+
+    if (criterio === "numero" || criterio === "anio" || criterio === "fecha" || criterio === "titulo") {
+      let filtered = cards.filter((card) => {
+        const val = getMetadataValue(card, criterio);
+        return val !== null && val !== "" && val !== false;
+      });
+
+      filtered.sort((a, b) => {
+        const valA = getMetadataValue(a, criterio);
+        const valB = getMetadataValue(b, criterio);
+        if (valA < valB) return -1;
+        if (valA > valB) return 1;
+        return 0;
+      });
+
+      filtered.forEach((card) => {
+        card.style.display = "block";
+        gallery.appendChild(card);
+      });
+
+      cards.forEach((card) => {
+        if (!filtered.includes(card)) card.style.display = "none";
+      });
+    } else if (criterio === "Terror" || criterio === "Ciencia Ficción" || criterio === "Oscuras") {
+      cards.forEach((card) => {
+        const tieneCategoria = getMetadataValue(card, criterio);
+        card.style.display = tieneCategoria ? "block" : "none";
+      });
+    } else {
+      cards.forEach((card) => {
+        card.style.display = "block";
+      });
+    }
+
+    cards.forEach((card) => {
+      const labelClass = "metadata-label";
+      let label = card.querySelector(`.${labelClass}`);
+
+      if (criterio !== "numero" && criterio !== "titulo") {
+        if (!label) {
+          label = document.createElement("div");
+          label.classList.add(labelClass);
+          card.appendChild(label);
+        }
+        let texto = "";
+        switch (criterio) {
+          case "anio":
+            texto = card.dataset.anio || "";
+            break;
+          case "fecha":
+            texto = card.dataset.fecha || "";
+            break;
+          case "Terror":
+          case "Ciencia Ficción":
+          case "Oscuras":
+            texto = criterio;
+            break;
+          default:
+            texto = "";
+        }
+        label.textContent = texto;
+        label.style.display = texto ? "block" : "none";
+        label.style.textAlign = "left";
+      } else if (label) {
+        label.style.display = "none";
+      }
+    });
+  }
+
+  ordenarSelect.addEventListener("change", ordenarYFiltrar);
+
+  // Ordenar inicialmente por número
+  ordenarSelect.value = "numero";
+  ordenarYFiltrar();
+
+});
