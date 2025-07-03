@@ -181,13 +181,10 @@ function ordenarYFiltrar() {
   const criterio = ordenarSelect.value;
   const cards = Array.from(gallery.querySelectorAll('.image-card'));
 
+  function ordenarYFiltrar() {
   if (!metadata || Object.keys(metadata).length === 0) {
-    // Si no hay metadata, mostrar todo
-    cards.forEach(card => {
-      card.style.display = 'block';
-      const label = card.querySelector('.metadata-label');
-      if (label) label.style.display = 'none';
-    });
+    const cards = Array.from(gallery.querySelectorAll('.image-card'));
+    cards.forEach(card => card.style.display = 'block');
     return;
   }
 
