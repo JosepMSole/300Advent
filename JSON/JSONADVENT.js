@@ -273,3 +273,29 @@ window.addEventListener("DOMContentLoaded", () => {
   ordenarYFiltrar();
 
 });
+
+
+
+
+
+
+const exportarBtn = document.getElementById('exportarJSON');
+
+exportarBtn.addEventListener('click', () => {
+  const data = localStorage.getItem('metadataGaleria');
+  if (!data) {
+    alert('No hay metadata para exportar.');
+    return;
+  }
+
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'metadata.json';  // Nombre del archivo a descargar
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
