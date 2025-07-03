@@ -221,17 +221,14 @@ body {
 .metadata-label {
   position: absolute;
   bottom: 5px;
-  left: 5px;
-  font-size: 0.7rem;
+  left: 5px;         /* Alinea a la izquierda */
+  font-size: 0.7rem; /* tamaño pequeño igual que el número */
   color: white;
   background: rgba(0,0,0,0.5);
-  padding: 1px 4px;
-  border-radius: 3px;
-  pointer-events: none;
-  z-index: 4;
-  user-select: none;
-  max-width: 90%;
+  padding: 2px 4px;
+  border-radius: 4px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  z-index: 4;
+  text-align: left;  /* asegura alineación texto izquierda */
 }
+
