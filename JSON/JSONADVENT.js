@@ -4,9 +4,18 @@ const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
 const ordenarSelect = document.getElementById("ordenarPor");
 
-// Esperamos que DOM esté listo
-window.addEventListener("DOMContentLoaded", () => {
+// Función para formatear fecha "YYYY-MM-DD" a "DD/MMM/YY" en español
+function formatearFecha(fechaStr) {
+  if (!fechaStr) return "";
+  const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+  const [year, month, day] = fechaStr.split("-");
+  if (!year || !month || !day) return fechaStr;
+  const yy = year.slice(2);
+  const mm = meses[parseInt(month, 10) - 1] || "";
+  return `${day}/${mm}/${yy}`;
+}
 
+window.addEventListener("DOMContentLoaded", () => {
   function cargarMetadataGaleria() {
     const data = localStorage.getItem("metadataGaleria");
     return data ? JSON.parse(data) : {};
@@ -16,24 +25,12 @@ window.addEventListener("DOMContentLoaded", () => {
     return String(n).padStart(3, "0");
   }
 
-  // Función para formatear fecha a DD/MES/AA (meses abreviados en español)
-  function formatearFecha(fechaStr) {
-    if (!fechaStr) return "";
-    const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
-    const fecha = new Date(fechaStr);
-    if (isNaN(fecha)) return "";
-    const dia = fecha.getDate().toString().padStart(2, '0');
-    const mes = meses[fecha.getMonth()];
-    const anio = fecha.getFullYear().toString().slice(-2);
-    return `${dia}/${mes}/${anio}`;
-  }
-
   const imageDivs = [];
   let disponibles = 0;
 
   const metadata = cargarMetadataGaleria();
 
-  gallery.innerHTML = '';
+  gallery.innerHTML = "";
 
   for (let i = 1; i <= totalImagenes; i++) {
     const numero = formatNumber(i);
@@ -46,7 +43,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (metadata[numero]) {
       const meta = metadata[numero];
       div.dataset.categorias = meta.categorias ? meta.categorias.join(",") : "";
-      div.dataset.anio = (meta.anio !== null && meta.anio !== undefined) ? meta.anio : "";
+      div.dataset.anio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "";
       div.dataset.fecha = meta.fecha || "";
       div.dataset.titulo = meta.titulo || "";
       div.title = meta.titulo || "";
@@ -136,7 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (meta) {
       let textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
       let textoAnio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "N/A";
-      let textoFecha = meta.fecha ? formatearFecha(meta.fecha) : "N/A";
+      let textoFecha = meta.fecha || "N/A";
       let textoTitulo = meta.titulo || "N/A";
 
       modalMetadata.innerHTML = `
@@ -206,7 +203,12 @@ window.addEventListener("DOMContentLoaded", () => {
     const criterio = ordenarSelect.value;
     const cards = Array.from(gallery.querySelectorAll(".image-card"));
 
-    if (criterio === "numero" || criterio === "anio" || criterio === "fecha" || criterio === "titulo") {
+    if (
+      criterio === "numero" ||
+      criterio === "anio" ||
+      criterio === "fecha" ||
+      criterio === "titulo"
+    ) {
       let filtered = cards.filter((card) => {
         const val = getMetadataValue(card, criterio);
         return val !== null && val !== "" && val !== false;
@@ -228,7 +230,11 @@ window.addEventListener("DOMContentLoaded", () => {
       cards.forEach((card) => {
         if (!filtered.includes(card)) card.style.display = "none";
       });
-    } else if (criterio === "Terror" || criterio === "Ciencia Ficción" || criterio === "Oscuras") {
+    } else if (
+      criterio === "Terror" ||
+      criterio === "Ciencia Ficción" ||
+      criterio === "Oscuras"
+    ) {
       cards.forEach((card) => {
         const tieneCategoria = getMetadataValue(card, criterio);
         card.style.display = tieneCategoria ? "block" : "none";
@@ -240,6 +246,14 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     cards.forEach((card) => {
+      // Mostrar u ocultar número colección según criterio
+      const numeroSpan = card.querySelector("span");
+      if (criterio === "numero") {
+        numeroSpan.style.display = "block";
+      } else {
+        numeroSpan.style.display = "none";
+      }
+
       const labelClass = "metadata-label";
       let label = card.querySelector(`.${labelClass}`);
 
@@ -279,5 +293,4 @@ window.addEventListener("DOMContentLoaded", () => {
   // Ordenar inicialmente por número
   ordenarSelect.value = "numero";
   ordenarYFiltrar();
-
 });
