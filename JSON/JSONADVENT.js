@@ -167,50 +167,88 @@ function getMetadataValue(div, criterio) {
     case 'Oscuras':
       return div.dataset.categorias?.split(',').map(c => c.trim()).includes(criterio);
     case 'anio':
-      return parseInt(div.dataset.anio) || 0;
+      return parseInt(div.dataset.anio) || null;
     case 'fecha':
-      return div.dataset.fecha ? new Date(div.dataset.fecha).getTime() : 0;
+      return div.dataset.fecha ? new Date(div.dataset.fecha).getTime() : null;
     case 'titulo':
-      return div.dataset.titulo?.toLowerCase() || '';
+      return div.dataset.titulo?.toLowerCase() || null;
     default:
-      return '';
+      return null;
   }
 }
 
-cards.forEach(card => {
-  if (criterio !== 'numero' && criterio !== 'titulo') {
-    // Mostrar etiqueta metadata si existe y criterio es año, fecha o categoría
-    let label = card.querySelector('.metadata-label');
-    if (!label) {
-      label = document.createElement('div');
-      label.classList.add('metadata-label');
-      card.appendChild(label);
-    }
-    let texto = '';
-    switch (criterio) {
-      case 'anio':
-        texto = card.dataset.anio || '';
-        break;
-      case 'fecha':
-        texto = card.dataset.fecha || '';
-        break;
-      case 'Terror':
-      case 'Ciencia Ficción':
-      case 'Oscuras':
-        texto = criterio;
-        break;
-      default:
-        texto = '';
-    }
-    label.textContent = texto;
-    label.style.display = texto ? 'block' : 'none';
+function ordenarYFiltrar() {
+  const criterio = ordenarSelect.value;
+  const cards = Array.from(gallery.querySelectorAll('.image-card'));
+
+  if (criterio === 'numero' || criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
+    // Ordenar y mostrar solo con metadata válida
+    let filtered = cards.filter(card => {
+      const val = getMetadataValue(card, criterio);
+      return val !== null && val !== '' && val !== false;
+    });
+
+    filtered.sort((a, b) => {
+      const valA = getMetadataValue(a, criterio);
+      const valB = getMetadataValue(b, criterio);
+      if (valA < valB) return -1;
+      if (valA > valB) return 1;
+      return 0;
+    });
+
+    filtered.forEach(card => {
+      card.style.display = 'block';
+      gallery.appendChild(card);
+    });
+
+    // Ocultar tarjetas sin metadata válida para criterio
+    cards.forEach(card => {
+      if (!filtered.includes(card)) card.style.display = 'none';
+    });
+  } else if (criterio === 'Terror' || criterio === 'Ciencia Ficción' || criterio === 'Oscuras') {
+    cards.forEach(card => {
+      const tieneCategoria = getMetadataValue(card, criterio);
+      card.style.display = tieneCategoria ? 'block' : 'none';
+    });
   } else {
-    // Ocultar etiqueta en numero y titulo
-    const label = card.querySelector('.metadata-label');
-    if (label) {
+    cards.forEach(card => {
+      card.style.display = 'block';
+    });
+  }
+
+  // Mostrar u ocultar etiquetas metadata en la galería
+  cards.forEach(card => {
+    const labelClass = 'metadata-label';
+    let label = card.querySelector(`.${labelClass}`);
+    if (criterio !== 'numero' && criterio !== 'titulo') {
+      if (!label) {
+        label = document.createElement('div');
+        label.classList.add(labelClass);
+        card.appendChild(label);
+      }
+      let texto = '';
+      switch (criterio) {
+        case 'anio':
+          texto = card.dataset.anio || '';
+          break;
+        case 'fecha':
+          texto = card.dataset.fecha || '';
+          break;
+        case 'Terror':
+        case 'Ciencia Ficción':
+        case 'Oscuras':
+          texto = criterio;
+          break;
+        default:
+          texto = '';
+      }
+      label.textContent = texto;
+      label.style.display = texto ? 'block' : 'none';
+      label.style.textAlign = 'left';  // Alineado a la izquierda
+    } else if (label) {
       label.style.display = 'none';
     }
-  }
-});
+  });
+}
 
 ordenarSelect.addEventListener('change', ordenarYFiltrar);
