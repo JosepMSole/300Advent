@@ -45,7 +45,6 @@
 
 <button id="exportarJSON" type="button">Exportar metadata JSON</button>
 
-
 <div class="mensaje" id="mensaje"></div>
 
 <h3>Metadata guardada</h3>
@@ -67,6 +66,7 @@
   const form = document.getElementById('formMetadata');
   const mensaje = document.getElementById('mensaje');
   const tablaBody = document.querySelector('#tablaMetadata tbody');
+  const exportarBtn = document.getElementById('exportarJSON');
 
   function cargarMetadata() {
     let data = localStorage.getItem('metadataGaleria');
@@ -122,6 +122,25 @@
     form.reset();
     mostrarTabla();
   };
+
+  exportarBtn.addEventListener('click', () => {
+    const data = localStorage.getItem('metadataGaleria');
+    if (!data) {
+      alert('No hay metadata para exportar.');
+      return;
+    }
+
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'metadata.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 
   mostrarTabla();
 </script>
