@@ -4,7 +4,6 @@ const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
 const ordenarSelect = document.getElementById('ordenarPor');
 
-// Función para cargar metadata desde localStorage
 function cargarMetadataGaleria() {
   const data = localStorage.getItem('metadataGaleria');
   return data ? JSON.parse(data) : {};
@@ -17,7 +16,6 @@ function formatNumber(n) {
 const imageDivs = [];
 let disponibles = 0;
 
-// Cargamos la metadata una sola vez
 const metadata = cargarMetadataGaleria();
 
 for (let i = 1; i <= totalImagenes; i++) {
@@ -28,14 +26,13 @@ for (let i = 1; i <= totalImagenes; i++) {
   div.classList.add("image-card");
   div.style.animationDelay = `${i * 5}ms`;
 
-  // Añadir atributos data-* si hay metadata
   if (metadata[numero]) {
     const meta = metadata[numero];
     div.dataset.categorias = meta.categorias ? meta.categorias.join(',') : '';
     div.dataset.anio = meta.anio || '';
     div.dataset.fecha = meta.fecha || '';
     div.dataset.titulo = meta.titulo || '';
-    div.title = meta.titulo || ''; // tooltip con título
+    div.title = meta.titulo || '';
   }
 
   const label = document.createElement("span");
@@ -87,13 +84,11 @@ function updateContador() {
   contadorBtn.textContent = `${disponibles} de ${totalImagenes}`;
 }
 
-// Modal
 const modal = document.getElementById("modal");
 const modalImg = document.getElementById("modalImage");
 const modalLink = document.getElementById("modalLink");
 const closeModal = document.getElementById("closeModal");
 
-// Creo un contenedor para metadata si no existe
 let modalMetadata = document.querySelector('.modal-metadata');
 if (!modalMetadata) {
   modalMetadata = document.createElement('div');
@@ -113,7 +108,6 @@ function openModal(src) {
     modalLink.style.display = "none";
   }
 
-  // Mostrar metadata si existe
   const meta = metadata[numero];
   if (meta) {
     let textoCategorias = meta.categorias ? meta.categorias.join(', ') : 'N/A';
@@ -148,7 +142,6 @@ window.addEventListener("DOMContentLoaded", () => {
   modal.style.display = "none";
 });
 
-// Botón desbloquear todas
 desbloquearBtn.addEventListener("click", () => {
   imageDivs.forEach(({ div, desbloqueadaRef, setDesbloqueada }) => {
     if (!desbloqueadaRef() && !div.classList.contains("locked")) {
@@ -165,11 +158,10 @@ desbloquearBtn.addEventListener("click", () => {
   });
 });
 
-// Función para obtener valor para ordenar o filtrar
 function getMetadataValue(div, criterio) {
   switch (criterio) {
     case 'numero':
-      return div.querySelector('span')?.textContent || '';
+      return parseInt(div.querySelector('span')?.textContent || '0', 10);
     case 'Terror':
     case 'Ciencia Ficción':
     case 'Oscuras':
@@ -185,19 +177,11 @@ function getMetadataValue(div, criterio) {
   }
 }
 
-// Función para ordenar y filtrar la galería
 function ordenarYFiltrar() {
   const criterio = ordenarSelect.value;
   const cards = Array.from(gallery.querySelectorAll('.image-card'));
 
-  if (criterio === 'numero') {
-    cards.sort((a, b) => {
-      const numA = parseInt(a.querySelector('span')?.textContent || '0', 10);
-      const numB = parseInt(b.querySelector('span')?.textContent || '0', 10);
-      return numA - numB;
-    });
-    cards.forEach(card => card.style.display = 'block');
-  } else if (criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
+  if (criterio === 'numero' || criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
     cards.sort((a, b) => {
       const valA = getMetadataValue(a, criterio);
       const valB = getMetadataValue(b, criterio);
@@ -205,20 +189,20 @@ function ordenarYFiltrar() {
       if (valA > valB) return 1;
       return 0;
     });
-    cards.forEach(card => card.style.display = 'block');
+    cards.forEach(card => {
+      card.style.display = 'block';
+      gallery.appendChild(card);
+    });
   } else if (criterio === 'Terror' || criterio === 'Ciencia Ficción' || criterio === 'Oscuras') {
     cards.forEach(card => {
       const tieneCategoria = getMetadataValue(card, criterio);
       card.style.display = tieneCategoria ? 'block' : 'none';
     });
   } else {
-    cards.forEach(card => card.style.display = 'block');
-  }
-
-  if (criterio !== 'Terror' && criterio !== 'Ciencia Ficción' && criterio !== 'Oscuras') {
-    cards.forEach(card => gallery.appendChild(card));
+    cards.forEach(card => {
+      card.style.display = 'block';
+    });
   }
 }
 
-// Escuchar cambios en el select para ordenar/filtrar
 ordenarSelect.addEventListener('change', ordenarYFiltrar);
