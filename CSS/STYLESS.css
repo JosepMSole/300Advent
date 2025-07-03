@@ -22,8 +22,10 @@ body {
 @media (max-width: 768px) {
   .gallery {
     grid-template-columns: repeat(5, 1fr) !important;
-    max-width: 100%;    /* Para que se adapte a la pantalla móvil */
-    padding: 0 10px;    /* Mantener margen en móvil */
+    max-width: 100% !important;
+    padding: 0 10px !important;
+    justify-content: center;     /* CENTRAR filas */
+    justify-items: center;       /* CENTRAR celdas */
   }
 }
 
