@@ -22,10 +22,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const metadata = cargarMetadataGaleria();
 
-  // Limpiar gallery (por si se recarga)
   gallery.innerHTML = '';
 
-  // Crear cards con metadata
   for (let i = 1; i <= totalImagenes; i++) {
     const numero = formatNumber(i);
     const imgPath = `imagenes/${numero}.jpg`;
@@ -99,7 +97,6 @@ window.addEventListener("DOMContentLoaded", () => {
     contadorBtn.textContent = `${disponibles} de ${totalImagenes}`;
   }
 
-  // Modal variables
   const modal = document.getElementById("modal");
   const modalImg = document.getElementById("modalImage");
   const modalLink = document.getElementById("modalLink");
@@ -275,10 +272,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
-
-
-
+// Exportar metadata a JSON descargable
 const exportarBtn = document.getElementById('exportarJSON');
 
 exportarBtn.addEventListener('click', () => {
