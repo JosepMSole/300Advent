@@ -2,15 +2,15 @@ const totalImagenes = 300;
 const gallery = document.getElementById("gallery");
 const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
-const ordenarSelect = document.getElementById('ordenarPor');
+const ordenarSelect = document.getElementById("ordenarPor");
 
 function cargarMetadataGaleria() {
-  const data = localStorage.getItem('metadataGaleria');
+  const data = localStorage.getItem("metadataGaleria");
   return data ? JSON.parse(data) : {};
 }
 
 function formatNumber(n) {
-  return String(n).padStart(3, '0');
+  return String(n).padStart(3, "0");
 }
 
 const imageDivs = [];
@@ -28,11 +28,11 @@ for (let i = 1; i <= totalImagenes; i++) {
 
   if (metadata[numero]) {
     const meta = metadata[numero];
-    div.dataset.categorias = meta.categorias ? meta.categorias.join(',') : '';
-    div.dataset.anio = meta.anio || '';
-    div.dataset.fecha = meta.fecha || '';
-    div.dataset.titulo = meta.titulo || '';
-    div.title = meta.titulo || '';
+    div.dataset.categorias = meta.categorias ? meta.categorias.join(",") : "";
+    div.dataset.anio = meta.anio || "";
+    div.dataset.fecha = meta.fecha || "";
+    div.dataset.titulo = meta.titulo || "";
+    div.title = meta.titulo || "";
   }
 
   const label = document.createElement("span");
@@ -53,7 +53,9 @@ for (let i = 1; i <= totalImagenes; i++) {
       div,
       img,
       desbloqueadaRef: () => desbloqueada,
-      setDesbloqueada: () => { desbloqueada = true; }
+      setDesbloqueada: () => {
+        desbloqueada = true;
+      },
     });
 
     img.addEventListener("click", () => {
@@ -89,11 +91,11 @@ const modalImg = document.getElementById("modalImage");
 const modalLink = document.getElementById("modalLink");
 const closeModal = document.getElementById("closeModal");
 
-let modalMetadata = document.querySelector('.modal-metadata');
+let modalMetadata = document.querySelector(".modal-metadata");
 if (!modalMetadata) {
-  modalMetadata = document.createElement('div');
-  modalMetadata.classList.add('modal-metadata');
-  document.querySelector('.modal-wrapper').appendChild(modalMetadata);
+  modalMetadata = document.createElement("div");
+  modalMetadata.classList.add("modal-metadata");
+  document.querySelector(".modal-wrapper").appendChild(modalMetadata);
 }
 
 function openModal(src) {
@@ -110,10 +112,10 @@ function openModal(src) {
 
   const meta = metadata[numero];
   if (meta) {
-    let textoCategorias = meta.categorias ? meta.categorias.join(', ') : 'N/A';
-    let textoAnio = meta.anio || 'N/A';
-    let textoFecha = meta.fecha || 'N/A';
-    let textoTitulo = meta.titulo || 'N/A';
+    let textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
+    let textoAnio = meta.anio || "N/A";
+    let textoFecha = meta.fecha || "N/A";
+    let textoTitulo = meta.titulo || "N/A";
 
     modalMetadata.innerHTML = `
       <div><strong>Categorías:</strong> ${textoCategorias}</div>
@@ -121,10 +123,10 @@ function openModal(src) {
       <div><strong>Fecha:</strong> ${textoFecha}</div>
       <div><strong>Título:</strong> ${textoTitulo}</div>
     `;
-    modalMetadata.style.display = 'block';
+    modalMetadata.style.display = "block";
   } else {
-    modalMetadata.style.display = 'none';
-    modalMetadata.innerHTML = '';
+    modalMetadata.style.display = "none";
+    modalMetadata.innerHTML = "";
   }
 }
 
@@ -140,7 +142,6 @@ window.onclick = (event) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   modal.style.display = "none";
-  ordenarYFiltrar();  // Ordenar al inicio con el valor actual
 });
 
 desbloquearBtn.addEventListener("click", () => {
@@ -161,17 +162,20 @@ desbloquearBtn.addEventListener("click", () => {
 
 function getMetadataValue(div, criterio) {
   switch (criterio) {
-    case 'numero':
-      return parseInt(div.querySelector('span')?.textContent || '0', 10);
-    case 'Terror':
-    case 'Ciencia Ficción':
-    case 'Oscuras':
-      return div.dataset.categorias?.split(',').map(c => c.trim()).includes(criterio);
-    case 'anio':
-      return parseInt(div.dataset.anio) || null;
-    case 'fecha':
+    case "numero":
+      return parseInt(div.querySelector("span")?.textContent || "0", 10);
+    case "Terror":
+    case "Ciencia Ficción":
+    case "Oscuras":
+      return div.dataset.categorias
+        ?.split(",")
+        .map((c) => c.trim())
+        .includes(criterio);
+    case "anio":
+      return div.dataset.anio !== "" ? parseInt(div.dataset.anio) : null;
+    case "fecha":
       return div.dataset.fecha ? new Date(div.dataset.fecha).getTime() : null;
-    case 'titulo':
+    case "titulo":
       return div.dataset.titulo?.toLowerCase() || null;
     default:
       return null;
@@ -180,13 +184,24 @@ function getMetadataValue(div, criterio) {
 
 function ordenarYFiltrar() {
   const criterio = ordenarSelect.value;
-  const cards = Array.from(gallery.querySelectorAll('.image-card'));
+  const cards = Array.from(gallery.querySelectorAll(".image-card"));
 
-  if (criterio === 'numero' || criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
-    // Filtrar cards con metadata para el criterio
-    let filtered = cards.filter(card => {
+  if (criterio === "numero" || criterio === "titulo") {
+    // Mostrar todas sin etiqueta y sin filtro
+    cards.forEach((card) => {
+      card.style.display = "block";
+      const label = card.querySelector(".metadata-label");
+      if (label) label.style.display = "none";
+    });
+    cards.forEach((card) => gallery.appendChild(card));
+    return;
+  }
+
+  if (criterio === "anio" || criterio === "fecha" || criterio === "titulo") {
+    // Para año, fecha, mostrar sólo con metadata válida y ordenarlas
+    let filtered = cards.filter((card) => {
       const val = getMetadataValue(card, criterio);
-      return val !== null && val !== '' && val !== false;
+      return val !== null && val !== "" && val !== false;
     });
 
     filtered.sort((a, b) => {
@@ -197,58 +212,62 @@ function ordenarYFiltrar() {
       return 0;
     });
 
-    filtered.forEach(card => {
-      card.style.display = 'block';
+    filtered.forEach((card) => {
+      card.style.display = "block";
       gallery.appendChild(card);
     });
 
-    cards.forEach(card => {
-      if (!filtered.includes(card)) card.style.display = 'none';
+    cards.forEach((card) => {
+      if (!filtered.includes(card)) card.style.display = "none";
     });
-  } else if (criterio === 'Terror' || criterio === 'Ciencia Ficción' || criterio === 'Oscuras') {
-    cards.forEach(card => {
+  } else if (
+    criterio === "Terror" ||
+    criterio === "Ciencia Ficción" ||
+    criterio === "Oscuras"
+  ) {
+    cards.forEach((card) => {
       const tieneCategoria = getMetadataValue(card, criterio);
-      card.style.display = tieneCategoria ? 'block' : 'none';
+      card.style.display = tieneCategoria ? "block" : "none";
     });
   } else {
-    cards.forEach(card => {
-      card.style.display = 'block';
+    cards.forEach((card) => {
+      card.style.display = "block";
     });
   }
 
-  cards.forEach(card => {
-    let labelClass = 'metadata-label';
+  cards.forEach((card) => {
+    let labelClass = "metadata-label";
     let label = card.querySelector(`.${labelClass}`);
 
-    if (criterio !== 'numero' && criterio !== 'titulo') {
+    if (criterio !== "numero" && criterio !== "titulo") {
       if (!label) {
-        label = document.createElement('div');
+        label = document.createElement("div");
         label.classList.add(labelClass);
         card.appendChild(label);
       }
-      let texto = '';
+      let texto = "";
       switch (criterio) {
-        case 'anio':
-          texto = card.dataset.anio || '';
+        case "anio":
+          texto = card.dataset.anio || "";
           break;
-        case 'fecha':
-          texto = card.dataset.fecha || '';
+        case "fecha":
+          texto = card.dataset.fecha || "";
           break;
-        case 'Terror':
-        case 'Ciencia Ficción':
-        case 'Oscuras':
+        case "Terror":
+        case "Ciencia Ficción":
+        case "Oscuras":
           texto = criterio;
           break;
         default:
-          texto = '';
+          texto = "";
       }
       label.textContent = texto;
-      label.style.display = texto ? 'block' : 'none';
-      label.style.textAlign = 'left';
+      label.style.display = texto ? "block" : "none";
+      label.style.textAlign = "left";
     } else if (label) {
-      label.style.display = 'none';
+      label.style.display = "none";
     }
   });
 }
 
-ordenarSelect.addEventListener('change', ordenarYFiltrar);
+ordenarSelect.addEventListener("change", ordenarYFiltrar);
