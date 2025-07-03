@@ -7,7 +7,74 @@ body {
   text-align: center;
   overflow-x: hidden;
   min-height: 100vh;
+  position: relative;
+  z-index: 0;
+  /* Contenido encima del fondo */
 }
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 100, 200, 0.3), transparent 60%),
+    radial-gradient(circle at 70% 50%, rgba(100, 180, 255, 0.3), transparent 70%),
+    radial-gradient(circle at 40% 70%, rgba(180, 255, 150, 0.2), transparent 60%);
+  animation: nebulaShift 30s linear infinite;
+  filter: blur(30px);
+}
+
+@keyframes nebulaShift {
+  0% {
+    background-position:
+      30% 30%,
+      70% 50%,
+      40% 70%;
+  }
+  50% {
+    background-position:
+      35% 35%,
+      65% 55%,
+      45% 75%;
+  }
+  100% {
+    background-position:
+      30% 30%,
+      70% 50%,
+      40% 70%;
+  }
+}
+
+/* Líneas de distorsión tipo glitch */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.03),
+      rgba(255,255,255,0.03) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  animation: glitchLines 2s linear infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes glitchLines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 4px;
+  }
+}
+
+/* Tu CSS original debajo */
 
 .gallery {
   display: grid;
@@ -215,20 +282,16 @@ body {
   background: #fdd835;
 }
 
-
-
-
 .metadata-label {
   position: absolute;
   bottom: 5px;
-  left: 5px;         /* Alinea a la izquierda */
-  font-size: 0.7rem; /* tamaño pequeño igual que el número */
+  left: 5px;
+  font-size: 0.7rem;
   color: white;
   background: rgba(0,0,0,0.5);
   padding: 2px 4px;
   border-radius: 4px;
   white-space: nowrap;
   z-index: 4;
-  text-align: left;  /* asegura alineación texto izquierda */
+  text-align: left;
 }
-
