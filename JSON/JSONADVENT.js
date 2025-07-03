@@ -2,6 +2,7 @@ const totalImagenes = 300;
 const gallery = document.getElementById("gallery");
 const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
+const ordenarSelect = document.getElementById('ordenarPor');
 
 // Función para cargar metadata desde localStorage
 function cargarMetadataGaleria() {
@@ -135,3 +136,61 @@ desbloquearBtn.addEventListener("click", () => {
     }
   });
 });
+
+// Función para obtener valor para ordenar o filtrar
+function getMetadataValue(div, criterio) {
+  switch (criterio) {
+    case 'numero':
+      return div.querySelector('span')?.textContent || '';
+    case 'Terror':
+    case 'Ciencia Ficción':
+    case 'Oscuras':
+      return div.dataset.categorias?.split(',').map(c => c.trim()).includes(criterio);
+    case 'anio':
+      return parseInt(div.dataset.anio) || 0;
+    case 'fecha':
+      return div.dataset.fecha ? new Date(div.dataset.fecha).getTime() : 0;
+    case 'titulo':
+      return div.dataset.titulo?.toLowerCase() || '';
+    default:
+      return '';
+  }
+}
+
+// Función para ordenar y filtrar la galería
+function ordenarYFiltrar() {
+  const criterio = ordenarSelect.value;
+  const cards = Array.from(gallery.querySelectorAll('.image-card'));
+
+  if (criterio === 'numero') {
+    cards.sort((a, b) => {
+      const numA = parseInt(a.querySelector('span')?.textContent || '0', 10);
+      const numB = parseInt(b.querySelector('span')?.textContent || '0', 10);
+      return numA - numB;
+    });
+    cards.forEach(card => card.style.display = 'block');
+  } else if (criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
+    cards.sort((a, b) => {
+      const valA = getMetadataValue(a, criterio);
+      const valB = getMetadataValue(b, criterio);
+      if (valA < valB) return -1;
+      if (valA > valB) return 1;
+      return 0;
+    });
+    cards.forEach(card => card.style.display = 'block');
+  } else if (criterio === 'Terror' || criterio === 'Ciencia Ficción' || criterio === 'Oscuras') {
+    cards.forEach(card => {
+      const tieneCategoria = getMetadataValue(card, criterio);
+      card.style.display = tieneCategoria ? 'block' : 'none';
+    });
+  } else {
+    cards.forEach(card => card.style.display = 'block');
+  }
+
+  if (criterio !== 'Terror' && criterio !== 'Ciencia Ficción' && criterio !== 'Oscuras') {
+    cards.forEach(card => gallery.appendChild(card));
+  }
+}
+
+// Escuchar cambios en el select para ordenar/filtrar
+ordenarSelect.addEventListener('change', ordenarYFiltrar);
