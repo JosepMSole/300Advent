@@ -181,8 +181,17 @@ function ordenarYFiltrar() {
   const criterio = ordenarSelect.value;
   const cards = Array.from(gallery.querySelectorAll('.image-card'));
 
+  if (!metadata || Object.keys(metadata).length === 0) {
+    // Si no hay metadata, mostrar todo
+    cards.forEach(card => {
+      card.style.display = 'block';
+      const label = card.querySelector('.metadata-label');
+      if (label) label.style.display = 'none';
+    });
+    return;
+  }
+
   if (criterio === 'numero' || criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
-    // Ordenar y mostrar solo con metadata válida
     let filtered = cards.filter(card => {
       const val = getMetadataValue(card, criterio);
       return val !== null && val !== '' && val !== false;
@@ -201,7 +210,6 @@ function ordenarYFiltrar() {
       gallery.appendChild(card);
     });
 
-    // Ocultar tarjetas sin metadata válida para criterio
     cards.forEach(card => {
       if (!filtered.includes(card)) card.style.display = 'none';
     });
@@ -216,7 +224,6 @@ function ordenarYFiltrar() {
     });
   }
 
-  // Mostrar u ocultar etiquetas metadata en la galería
   cards.forEach(card => {
     const labelClass = 'metadata-label';
     let label = card.querySelector(`.${labelClass}`);
@@ -244,11 +251,12 @@ function ordenarYFiltrar() {
       }
       label.textContent = texto;
       label.style.display = texto ? 'block' : 'none';
-      label.style.textAlign = 'left';  // Alineado a la izquierda
+      label.style.textAlign = 'left';
     } else if (label) {
       label.style.display = 'none';
     }
   });
 }
+
 
 ordenarSelect.addEventListener('change', ordenarYFiltrar);
