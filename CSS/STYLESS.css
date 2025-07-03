@@ -17,6 +17,12 @@ body {
   margin: 0 auto;
 }
 
+/* Responsive: 5 columnas en pantallas pequeñas */
+@media (max-width: 600px) {
+  .gallery {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
 
 .image-card {
   position: relative;
@@ -136,7 +142,6 @@ body {
   z-index: 11;
 }
 
-/* Animaciones */
 @keyframes zoomShudder {
   0%   { transform: translate(-50%, -50%) scale(1); }
   20%  { transform: translate(-49%, -51%) scale(1.2); }
