@@ -3,12 +3,21 @@ const gallery = document.getElementById("gallery");
 const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
 
+// Función para cargar metadata desde localStorage
+function cargarMetadataGaleria() {
+  const data = localStorage.getItem('metadataGaleria');
+  return data ? JSON.parse(data) : {};
+}
+
 function formatNumber(n) {
   return String(n).padStart(3, '0');
 }
 
 const imageDivs = [];
 let disponibles = 0;
+
+// Cargamos la metadata una sola vez
+const metadata = cargarMetadataGaleria();
 
 for (let i = 1; i <= totalImagenes; i++) {
   const numero = formatNumber(i);
@@ -17,6 +26,16 @@ for (let i = 1; i <= totalImagenes; i++) {
   const div = document.createElement("div");
   div.classList.add("image-card");
   div.style.animationDelay = `${i * 5}ms`;
+
+  // Añadir atributos data-* si hay metadata
+  if (metadata[numero]) {
+    const meta = metadata[numero];
+    div.dataset.categorias = meta.categorias ? meta.categorias.join(',') : '';
+    div.dataset.anio = meta.anio || '';
+    div.dataset.fecha = meta.fecha || '';
+    div.dataset.titulo = meta.titulo || '';
+    div.title = meta.titulo || ''; // tooltip con título
+  }
 
   const label = document.createElement("span");
   label.textContent = numero;
@@ -60,7 +79,6 @@ for (let i = 1; i <= totalImagenes; i++) {
     div.classList.add("locked");
   };
 
-  // Añadir el contenedor siempre (en orden)
   gallery.appendChild(div);
 }
 
