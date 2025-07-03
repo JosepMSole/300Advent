@@ -140,6 +140,7 @@ window.onclick = (event) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   modal.style.display = "none";
+  ordenarYFiltrar();  // Ordenar al inicio con el valor actual
 });
 
 desbloquearBtn.addEventListener("click", () => {
@@ -181,14 +182,8 @@ function ordenarYFiltrar() {
   const criterio = ordenarSelect.value;
   const cards = Array.from(gallery.querySelectorAll('.image-card'));
 
-  function ordenarYFiltrar() {
-  if (!metadata || Object.keys(metadata).length === 0) {
-    const cards = Array.from(gallery.querySelectorAll('.image-card'));
-    cards.forEach(card => card.style.display = 'block');
-    return;
-  }
-
   if (criterio === 'numero' || criterio === 'anio' || criterio === 'fecha' || criterio === 'titulo') {
+    // Filtrar cards con metadata para el criterio
     let filtered = cards.filter(card => {
       const val = getMetadataValue(card, criterio);
       return val !== null && val !== '' && val !== false;
@@ -222,8 +217,9 @@ function ordenarYFiltrar() {
   }
 
   cards.forEach(card => {
-    const labelClass = 'metadata-label';
+    let labelClass = 'metadata-label';
     let label = card.querySelector(`.${labelClass}`);
+
     if (criterio !== 'numero' && criterio !== 'titulo') {
       if (!label) {
         label = document.createElement('div');
@@ -254,6 +250,5 @@ function ordenarYFiltrar() {
     }
   });
 }
-
 
 ordenarSelect.addEventListener('change', ordenarYFiltrar);
