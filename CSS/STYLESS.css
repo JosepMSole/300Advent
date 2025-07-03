@@ -15,14 +15,18 @@ body {
   gap: 10px;
   max-width: 1000px;
   margin: 0 auto;
+  width: 100%;          /* Añadido para que no exceda el ancho de pantalla */
+  padding: 0 10px;      /* Opcional, para dar algo de margen en móvil */
 }
 
-/* Responsive: 5 columnas en pantallas pequeñas */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .gallery {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr) !important;
+    max-width: 100%;    /* Para que se adapte a la pantalla móvil */
+    padding: 0 10px;    /* Mantener margen en móvil */
   }
 }
+
 
 .image-card {
   position: relative;
