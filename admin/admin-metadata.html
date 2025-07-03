@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Los Fatos de Metadates</title>
+<title>Admin Metadata Galería</title>
 <style>
   body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
   label { display: block; margin-top: 10px; }
@@ -16,10 +16,12 @@
 </head>
 <body>
 
-<h2>Editar les viandes de metadata de les imatges</h2>
+<h2>Editar metadata de imágenes</h2>
 
 <form id="formMetadata">
-  <label>ID imagen (ej. 001): <input type="text" id="id" required pattern="\d{3}" title="Introduce un número de 3 dígitos, ejemplo: 001" /></label>
+  <label>ID imagen (ej. 001): 
+    <input type="text" id="id" required pattern="\d{3}" title="Introduce un número de 3 dígitos, ejemplo: 001" />
+  </label>
   
   <label>Categorías (selecciona una o más): 
     <select id="categorias" multiple size="3" required>
@@ -29,9 +31,15 @@
     </select>
   </label>
   
-  <label>Año: <input type="number" id="anio" min="-300000" max="3500" step="1" /></label>
-  <label>Fecha publicación (YYYY-MM-DD): <input type="date" id="fecha" /></label>
-  <label>Título: <input type="text" id="titulo" /></label>
+  <label>Año: 
+    <input type="number" id="anio" min="-300000" max="3500" step="1" />
+  </label>
+  <label>Fecha publicación (YYYY-MM-DD): 
+    <input type="date" id="fecha" />
+  </label>
+  <label>Título: 
+    <input type="text" id="titulo" />
+  </label>
   <button type="submit">Guardar metadata</button>
 </form>
 
@@ -39,7 +47,16 @@
 
 <h3>Metadata guardada</h3>
 <table id="tablaMetadata">
-  <thead><tr><th>ID</th><th>Categorías</th><th>Año</th><th>Fecha</th><th>Título</th><th>Acciones</th></tr></thead>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Categorías</th>
+      <th>Año</th>
+      <th>Fecha</th>
+      <th>Título</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
   <tbody></tbody>
 </table>
 
