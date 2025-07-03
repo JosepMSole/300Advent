@@ -35,7 +35,6 @@
   <button type="submit">Guardar metadata</button>
 </form>
 
-
 <div class="mensaje" id="mensaje"></div>
 
 <h3>Metadata guardada</h3>
@@ -75,7 +74,6 @@
       `;
       tablaBody.appendChild(tr);
     }
-    // Botones borrar
     document.querySelectorAll('.borrarBtn').forEach(btn => {
       btn.onclick = () => {
         const id = btn.getAttribute('data-id');
