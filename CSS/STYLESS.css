@@ -65,7 +65,7 @@ body {
 }
 
 .image-card.locked {
-  background: #303030;
+  background: #1b1b1b;
 }
 
 .image-card.locked::after {
