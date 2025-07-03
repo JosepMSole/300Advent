@@ -93,6 +93,14 @@ const modalImg = document.getElementById("modalImage");
 const modalLink = document.getElementById("modalLink");
 const closeModal = document.getElementById("closeModal");
 
+// Creo un contenedor para metadata si no existe
+let modalMetadata = document.querySelector('.modal-metadata');
+if (!modalMetadata) {
+  modalMetadata = document.createElement('div');
+  modalMetadata.classList.add('modal-metadata');
+  document.querySelector('.modal-wrapper').appendChild(modalMetadata);
+}
+
 function openModal(src) {
   modal.style.display = "flex";
   modalImg.src = src;
@@ -103,6 +111,26 @@ function openModal(src) {
     modalLink.style.display = "inline-block";
   } else {
     modalLink.style.display = "none";
+  }
+
+  // Mostrar metadata si existe
+  const meta = metadata[numero];
+  if (meta) {
+    let textoCategorias = meta.categorias ? meta.categorias.join(', ') : 'N/A';
+    let textoAnio = meta.anio || 'N/A';
+    let textoFecha = meta.fecha || 'N/A';
+    let textoTitulo = meta.titulo || 'N/A';
+
+    modalMetadata.innerHTML = `
+      <div><strong>Categorías:</strong> ${textoCategorias}</div>
+      <div><strong>Año:</strong> ${textoAnio}</div>
+      <div><strong>Fecha:</strong> ${textoFecha}</div>
+      <div><strong>Título:</strong> ${textoTitulo}</div>
+    `;
+    modalMetadata.style.display = 'block';
+  } else {
+    modalMetadata.style.display = 'none';
+    modalMetadata.innerHTML = '';
   }
 }
 
