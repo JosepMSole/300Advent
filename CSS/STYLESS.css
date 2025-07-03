@@ -15,8 +15,8 @@ body {
   gap: 10px;
   max-width: 1000px;
   margin: 0 auto;
-  width: 100%;          /* Añadido para que no exceda el ancho de pantalla */
-  padding: 0 10px;      /* Opcional, para dar algo de margen en móvil */
+  width: 100%;
+  padding: 0 10px;
 }
 
 @media (max-width: 768px) {
@@ -24,11 +24,10 @@ body {
     grid-template-columns: repeat(5, 1fr) !important;
     max-width: 100% !important;
     padding: 0 10px !important;
-    justify-content: center;     /* CENTRAR filas */
-    justify-items: center;       /* CENTRAR celdas */
+    justify-content: center;
+    justify-items: center;
   }
 }
-
 
 .image-card {
   position: relative;
@@ -143,7 +142,7 @@ body {
 .modal-metadata {
   position: absolute;
   bottom: 20px;
-  left: calc(20px + 100% + 10px); /* 10px gap after button */
+  left: calc(20px + 100% + 10px);
   color: #ffeb3b;
   font-size: 0.75rem;
   font-weight: normal;
@@ -155,7 +154,6 @@ body {
   font-family: monospace;
   user-select: none;
 }
-
 
 .close {
   position: absolute;
