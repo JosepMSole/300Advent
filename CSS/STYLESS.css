@@ -317,3 +317,31 @@ body {
   border-collapse: separate;
   border-spacing: 0 10px;
 }
+
+
+
+
+
+
+@media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+
+  .modal-wrapper {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .modal-metadata {
+    position: static !important;
+    max-width: 90%;
+    margin: 0 auto;
+    text-align: center;
+    color: #ffeb3b;
+    font-size: 0.85rem;
+    font-family: monospace;
+    line-height: 1.4;
+  }
+}
