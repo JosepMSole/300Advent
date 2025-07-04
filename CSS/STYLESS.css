@@ -239,7 +239,7 @@ body {
   top: 0;
   left: 100%; /* a la derecha del modal-wrapper */
   margin-left: 15px;
-  max-width: 300px; /* ancho máximo para encajonar texto */
+  max-width: 520px; /* aumentado para 80 caracteres aprox */
   color: #ffeb3b;
   font-size: 0.9rem;
   font-weight: normal;
