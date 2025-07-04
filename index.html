@@ -5,40 +5,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mural Completo</title>
+  <link rel="icon" href="icon/ico.ico" type="image/x-icon" />
   <link rel="stylesheet" href="CSS/STYLESS.css" />
 </head>
 <body>
 
   <!-- Video de fondo -->
-  <video autoplay muted loop playsinline id="bg-video" aria-hidden="true" tabindex="-1">
+  <video autoplay muted loop playsinline id="bg-video">
     <source src="videos/300ADVENT - BG 1.mp4" type="video/mp4" />
     Tu navegador no soporta videos HTML5.
   </video>
 
-  <div id="content-wrapper">
-    <!-- Desplegable para ordenar -->
-    <label for="ordenarPor" style="display:block; margin-bottom:8px; font-weight:bold;">
-      ORDENAR POR:
-    </label>
-    <select id="ordenarPor" style="margin-bottom: 15px; padding: 6px; font-size: 1rem;">
-      <option value="" selected disabled>ORDENAR POR</option>
-      <option value="numero">Número de Colección</option>
-      <option value="Terror">Terror</option>
-      <option value="Ciencia Ficción">Ciencia Ficción</option>
-      <option value="Oscuras">Oscuras</option>
-      <option value="anio">Año</option>
-      <option value="fecha">Fecha de Publicación</option>
-      <option value="titulo">Título</option>
-    </select>
+  <!-- Aquí el contenido principal -->
 
-    <!-- Botón para desbloquear -->
-    <button id="desbloquear-todas">🔓 Desbloquear disponibles</button>
+  <!-- Desplegable para ordenar -->
+  <label for="ordenarPor" style="display:block; margin-bottom:8px; font-weight:bold;">
+    ORDENAR POR:
+  </label>
+  <select id="ordenarPor" style="margin-bottom: 15px; padding: 6px; font-size: 1rem;">
+    <option value="" selected disabled>ORDENAR POR</option>
+    <option value="numero">Número de Colección</option>
+    <option value="Terror">Terror</option>
+    <option value="Ciencia Ficción">Ciencia Ficción</option>
+    <option value="Oscuras">Oscuras</option>
+    <option value="anio">Año</option>
+    <option value="fecha">Fecha de Publicación</option>
+    <option value="titulo">Título</option>
+  </select>
 
-    <!-- Botón contador -->
-    <button id="contador-disponibles">0 de 300</button>
+  <!-- Botón para desbloquear -->
+  <button id="desbloquear-todas">🔓 Desbloquear disponibles</button>
 
-    <div class="gallery" id="gallery"></div>
-  </div>
+  <!-- Botón contador -->
+  <button id="contador-disponibles">0 de 300</button>
+
+  <div class="gallery" id="gallery"></div>
 
   <!-- Modal -->
   <div id="modal" class="modal">
