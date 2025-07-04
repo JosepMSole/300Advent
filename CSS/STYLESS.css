@@ -112,21 +112,23 @@ body {
   }
 
   .modal-link {
-    order: 1;
     position: absolute;
-    top: 10px;
+    top: 50%;
     left: 10px;
-    display: inline-block;
-    width: auto;
-    padding: 6px 12px;
-    font-size: 0.9rem;
+    transform: translateY(-50%);
+    z-index: 3;
     background: #ffeb3b;
     color: black;
+    padding: 8px 16px;
     border-radius: 6px;
     font-weight: bold;
-    z-index: 20;
     text-decoration: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-size: 0.95rem;
+    transition: background 0.3s;
+  }
+
+  .modal-link:hover {
+    background: #fdd835;
   }
 
   .modal-metadata {
