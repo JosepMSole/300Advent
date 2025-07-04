@@ -318,11 +318,7 @@ body {
   border-spacing: 0 10px;
 }
 
-
-
-
-
-
+/* MOBILE OPTIMIZATION MODAL VIEW */
 @media (max-width: 768px) {
   .gallery {
     grid-template-columns: repeat(5, 1fr) !important;
@@ -332,16 +328,33 @@ body {
     flex-direction: column !important;
     align-items: center !important;
     gap: 10px !important;
+    padding: 10px;
+  }
+
+  .modal-wrapper img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  #modalLink {
+    display: block;
+    margin: 10px auto 0;
+    font-size: 14px;
+    padding: 8px 12px;
   }
 
   .modal-metadata {
     position: static !important;
     max-width: 90%;
     margin: 0 auto;
-    text-align: center;
+    text-align: left;
     color: #ffeb3b;
-    font-size: 0.85rem;
+    font-size: 12px;
     font-family: monospace;
     line-height: 1.4;
+  }
+
+  .modal-metadata div {
+    margin-bottom: 6px;
   }
 }
