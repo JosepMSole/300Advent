@@ -12,11 +12,25 @@
   .mensaje { margin-top: 10px; color: green; }
   table { margin-top: 20px; width: 100%; border-collapse: collapse; }
   th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+
+  /* Añadido para contador total metadata */
+  #totalMetadataCount {
+    margin: 10px 0 20px 0;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: black;
+  }
+
+  /* Reducir tamaño texto desde metadata guardada hacia abajo */
+  .reducido {
+    font-size: 50%;
+  }
 </style>
 </head>
 <body>
 
 <h2>Consola super-pràctica per afegir les metadades dels trons</h2>
+<div id="totalMetadataCount">Metadatas guardadas: 0</div>
 
 <form id="formMetadata">
   <label>ID imagen (ej. 001): 
@@ -48,25 +62,27 @@
 
 <div class="mensaje" id="mensaje"></div>
 
-<h3>Metadata guardada</h3>
-<table id="tablaMetadata">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Categorías</th>
-      <th>Año</th>
-      <th>Fecha</th>
-      <th>Título</th>
-      <th>Sinopsis</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+<div class="reducido">
+  <h3>Metadata guardada</h3>
+  <table id="tablaMetadata">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Categorías</th>
+        <th>Año</th>
+        <th>Fecha</th>
+        <th>Título</th>
+        <th>Sinopsis</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<!-- Botón Exportar JSON al pie -->
-<div style="margin-top: 20px; text-align: center;">
-  <button id="exportarJSON" type="button">Exportar metadata JSON</button>
+  <!-- Botón Exportar JSON al pie -->
+  <div style="margin-top: 20px; text-align: center;">
+    <button id="exportarJSON" type="button">Exportar metadata JSON</button>
+  </div>
 </div>
 
 <script>
@@ -74,6 +90,7 @@
   const mensaje = document.getElementById('mensaje');
   const tablaBody = document.querySelector('#tablaMetadata tbody');
   const exportarBtn = document.getElementById('exportarJSON');
+  const totalMetadataCount = document.getElementById('totalMetadataCount');
 
   function cargarMetadata() {
     let data = localStorage.getItem('metadataGaleria');
@@ -90,6 +107,9 @@
 
     // Ordenar IDs numéricamente
     const idsOrdenados = Object.keys(data).sort((a, b) => parseInt(a) - parseInt(b));
+
+    // Actualizar contador de metadatas guardadas
+    totalMetadataCount.textContent = `Metadatas guardadas: ${idsOrdenados.length}`;
 
     for (const id of idsOrdenados) {
       const item = data[id];
