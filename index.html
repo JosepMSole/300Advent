@@ -9,6 +9,12 @@
 </head>
 <body>
 
+  <!-- Video de fondo -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="videos/300ADVENT - BG 1.mp4" type="video/mp4" />
+    Tu navegador no soporta videos HTML5.
+  </video>
+
   <!-- Logo principal -->
   <img src="imagenes/300STORIES.png" alt="Logo 300 Stories" id="logoPrincipal" />
 
@@ -29,9 +35,6 @@
     <option value="titulo">Título</option>
   </select>
 
-  <!-- Botón "Volver a las Stories" -->
-  <button id="volverStories" type="button">Volver a las Stories</button>
-
   <!-- Contenedor botones desbloquear y contador -->
   <div class="botonera">
     <button id="desbloquear-todas">🔓 Desbloquear disponibles</button>
@@ -39,6 +42,11 @@
   </div>
 
   <div class="gallery" id="gallery"></div>
+
+  <!-- Botón "Volver a las Stories" debajo del mural -->
+  <div class="volver-container">
+    <button id="volverStories" type="button">Volver a las Stories</button>
+  </div>
 
   <!-- Modal -->
   <div id="modal" class="modal">
@@ -53,7 +61,6 @@
   <script src="JS/main.js"></script>
 
   <script>
-    // Redirigir al hacer clic en "Volver a las Stories"
     document.getElementById('volverStories').addEventListener('click', () => {
       window.location.href = 'https://www.disturbingstories.com/stories.html';
     });
