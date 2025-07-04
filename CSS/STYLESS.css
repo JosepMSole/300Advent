@@ -95,18 +95,31 @@ body {
 }
 
 @media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+
   .modal-wrapper {
     flex-direction: column !important;
     align-items: center !important;
     gap: 10px !important;
   }
 
-  .modal-content {
+  .modal-link {
     order: 1;
+    position: static;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .modal-content {
+    order: 2;
+    max-width: 90vw;
+    height: auto;
   }
 
   .modal-metadata {
-    order: 2;
+    order: 3;
     position: static !important;
     max-width: 90%;
     margin: 0 auto;
@@ -115,27 +128,10 @@ body {
     font-size: 0.85rem;
     font-family: monospace;
     line-height: 1.4;
-  }
-
-  #modalLink {
-    order: 3;
-    position: static !important;
-    display: inline-block;
-    margin: 20px auto 0 auto;
-    padding: 10px 20px;
-    background: #ffeb3b;
-    color: black;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 1rem;
-    text-align: center;
-  }
-
-  #modalLink:hover {
-    background: #fdd835;
+    padding-bottom: 20px;
   }
 }
+
 
 
 
