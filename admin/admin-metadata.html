@@ -87,7 +87,11 @@
   function mostrarTabla() {
     const data = cargarMetadata();
     tablaBody.innerHTML = '';
-    for (const id in data) {
+
+    // Ordenar IDs numéricamente
+    const idsOrdenados = Object.keys(data).sort((a, b) => parseInt(a) - parseInt(b));
+
+    for (const id of idsOrdenados) {
       const item = data[id];
       const categoriasStr = item.categorias.join(', ');
       const sinopsisStr = item.sinopsis ? item.sinopsis : '';
@@ -103,6 +107,7 @@
       `;
       tablaBody.appendChild(tr);
     }
+
     document.querySelectorAll('.borrarBtn').forEach(btn => {
       btn.onclick = () => {
         const id = btn.getAttribute('data-id');
