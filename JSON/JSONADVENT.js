@@ -216,7 +216,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function ordenarYFiltrar() {
     const criterio = ordenarSelect.value;
-    const cards = Array.from(gallery.querySelectorAll(".image-card"));
+
+    let filtrados = imageDivs.filter(({ div }) => {
+      const val = getMetadataValue(div, criterio);
+      return val !== null && val !== "" && val !== false;
+    });
 
     if (
       criterio === "numero" ||
@@ -224,75 +228,57 @@ window.addEventListener("DOMContentLoaded", () => {
       criterio === "fecha" ||
       criterio === "titulo"
     ) {
-      let filtered = cards.filter((card) => {
-        const val = getMetadataValue(card, criterio);
-        return val !== null && val !== "" && val !== false;
-      });
-
-      filtered.sort((a, b) => {
-        const valA = getMetadataValue(a, criterio);
-        const valB = getMetadataValue(b, criterio);
+      filtrados.sort((a, b) => {
+        const valA = getMetadataValue(a.div, criterio);
+        const valB = getMetadataValue(b.div, criterio);
         if (valA < valB) return -1;
         if (valA > valB) return 1;
         return 0;
-      });
-
-      filtered.forEach((card) => {
-        card.style.display = "block";
-        gallery.appendChild(card);
-      });
-
-      cards.forEach((card) => {
-        if (!filtered.includes(card)) card.style.display = "none";
       });
     } else if (
       criterio === "Terror" ||
       criterio === "Ciencia Ficción" ||
       criterio === "Oscuras"
     ) {
-      cards.forEach((card) => {
-        const tieneCategoria = getMetadataValue(card, criterio);
-        card.style.display = tieneCategoria ? "block" : "none";
-      });
+      filtrados = imageDivs.filter(({ div }) =>
+        getMetadataValue(div, criterio)
+      );
     } else {
-      cards.forEach((card) => {
-        card.style.display = "block";
-      });
+      filtrados = imageDivs;
     }
 
-    cards.forEach((card) => {
-      const numeroSpan = card.querySelector("span");
-      if (criterio === "numero") {
-        numeroSpan.style.display = "block";
-      } else {
-        numeroSpan.style.display = "none";
-      }
+    gallery.innerHTML = "";
+    filtrados.forEach(({ div }) => {
+      gallery.appendChild(div);
+      div.style.display = "block";
+
+      const numeroSpan = div.querySelector("span");
+      numeroSpan.style.display = criterio === "numero" ? "block" : "none";
 
       const labelClass = "metadata-label";
-      let label = card.querySelector(`.${labelClass}`);
-
+      let label = div.querySelector(`.${labelClass}`);
       if (criterio !== "numero" && criterio !== "titulo") {
         if (!label) {
           label = document.createElement("div");
           label.classList.add(labelClass);
-          card.appendChild(label);
+          div.appendChild(label);
         }
+
         let texto = "";
         switch (criterio) {
           case "anio":
-            texto = card.dataset.anio || "";
+            texto = div.dataset.anio || "";
             break;
           case "fecha":
-            texto = formatearFechaCompleta(card.dataset.fecha) || "";
+            texto = formatearFechaCompleta(div.dataset.fecha) || "";
             break;
           case "Terror":
           case "Ciencia Ficción":
           case "Oscuras":
             texto = criterio;
             break;
-          default:
-            texto = "";
         }
+
         label.textContent = texto;
         label.style.display = texto ? "block" : "none";
       } else if (label) {
