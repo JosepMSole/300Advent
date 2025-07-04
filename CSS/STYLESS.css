@@ -236,18 +236,23 @@ body {
 
 .modal-metadata {
   position: absolute;
-  bottom: 20px;
-  left: calc(20px + 100% + 10px);
+  top: 0;
+  left: 100%; /* a la derecha del modal-wrapper */
+  margin-left: 15px;
+  max-width: 300px; /* ancho máximo para encajonar texto */
   color: #ffeb3b;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-weight: normal;
-  white-space: nowrap;
-  max-width: 250px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  z-index: 2;
   font-family: monospace;
+  white-space: normal;
+  overflow-wrap: break-word;
+  z-index: 2;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 90vh; /* que no exceda altura de la imagen */
+  overflow-y: auto; /* scroll si hay mucho texto */
 }
 
 .close {
