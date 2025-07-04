@@ -4,7 +4,7 @@
   <meta name="robots" content="noindex, nofollow" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mural Completo</title>
+  <title>Mural 300 Interactivo</title>
   <link rel="stylesheet" href="CSS/STYLESS.css" />
   <link rel="icon" href="icon/ico.ico" type="image/x-icon" />
 </head>
@@ -48,6 +48,11 @@
     <button id="volverStories" type="button">Volver a las Stories</button>
   </div>
 
+  <!-- Botón "Volver arriba" -->
+  <div class="volver-container">
+    <button id="volverArriba" type="button">Volver arriba</button>
+  </div>
+
   <!-- Modal -->
   <div id="modal" class="modal">
     <span class="close" id="closeModal">&times;</span>
@@ -63,6 +68,10 @@
   <script>
     document.getElementById('volverStories').addEventListener('click', () => {
       window.location.href = 'https://www.disturbingstories.com/stories.html';
+    });
+
+    document.getElementById('volverArriba').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 
