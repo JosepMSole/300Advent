@@ -234,35 +234,32 @@ body {
 }
 
 .modal-wrapper {
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 10px !important;
   position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
 }
 
 .modal-content {
-  max-height: 90vh;
+  order: 2;
   max-width: 90vw;
-  border-radius: 10px;
-  object-fit: contain;
-  display: block;
-  position: relative;
-  z-index: 1;
+  height: auto;
 }
 
 .modal-link {
+  order: 1;
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  padding: 10px 20px;
+  top: 10px;
+  left: 10px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
   background: #ffeb3b;
   color: black;
-  text-decoration: none;
   border-radius: 6px;
   font-weight: bold;
-  transition: background 0.3s;
-  font-size: 1rem;
-  z-index: 2;
+  z-index: 20;
+  text-decoration: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .modal-link:hover {
@@ -270,24 +267,17 @@ body {
 }
 
 .modal-metadata {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  margin-left: 15px;
-  max-width: 300px;
+  order: 3;
+  position: static !important;
+  max-width: 90%;
+  margin: 0 auto;
+  text-align: center;
   color: #ffeb3b;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-family: monospace;
-  white-space: normal;
-  overflow-wrap: break-word;
-  z-index: 2;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 90vh;
-  overflow-y: auto;
-  text-align: left;
+  line-height: 1.4;
+  padding-bottom: 20px;
+  display: block !important; /* 👈 asegúrate de forzar su visibilidad */
 }
 
 .close {
