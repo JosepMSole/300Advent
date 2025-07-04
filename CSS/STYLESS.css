@@ -95,6 +95,16 @@ body {
 }
 
 @media (max-width: 768px) {
+
+  #modalLink {
+    position: static !important;
+    display: block;
+    margin: 10px auto 0 auto;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    text-align: center;
+  }
+
   .gallery {
     grid-template-columns: repeat(5, 1fr);
   }
@@ -319,45 +329,3 @@ body {
 }
 
 /* MOBILE OPTIMIZATION MODAL VIEW */
-@media (max-width: 768px) {
-  .gallery {
-    grid-template-columns: repeat(5, 1fr) !important;
-  }
-
-  .modal-wrapper {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 10px;
-  }
-
-  .modal-wrapper img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  #modalLink {
-    position: static !important;
-    display: block;
-    margin: 10px auto;
-    font-size: 14px;
-    padding: 8px 16px;
-    text-align: center;
-  }
-
-
-  .modal-metadata {
-    position: static !important;
-    max-width: 90%;
-    margin: 0 auto;
-    text-align: left;
-    color: #ffeb3b;
-    font-size: 12px;
-    font-family: monospace;
-    line-height: 1.4;
-  }
-
-  .modal-metadata div {
-    margin-bottom: 6px;
-  }
-}
