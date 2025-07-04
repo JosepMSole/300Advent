@@ -101,12 +101,13 @@ body {
 }
 
 @media (max-width: 768px) {
-  .gallery {
-    grid-template-columns: repeat(5, 1fr) !important;
-    max-width: 100% !important;
-    padding: 0 10px !important;
-    justify-content: center;
-    justify-items: center;
+  .modal-metadata {
+    position: static; /* quitamos absolute */
+    max-width: 100%;
+    margin-left: 0;
+    max-height: none;
+    overflow-y: visible;
+    padding-top: 10px; /* un poco de espacio arriba */
   }
 }
 
@@ -237,9 +238,9 @@ body {
 .modal-metadata {
   position: absolute;
   top: 0;
-  left: 100%; /* a la derecha del modal-wrapper */
+  left: 100%; /* a la derecha */
   margin-left: 15px;
-  max-width: 520px; /* aumentado para 80 caracteres aprox */
+  max-width: 300px;
   color: #ffeb3b;
   font-size: 0.9rem;
   font-weight: normal;
@@ -251,8 +252,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 90vh; /* que no exceda altura de la imagen */
-  overflow-y: auto; /* scroll si hay mucho texto */
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .close {
