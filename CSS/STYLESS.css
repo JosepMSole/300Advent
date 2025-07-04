@@ -245,3 +245,21 @@ body {
   z-index: -1; /* Detrás de todo */
   pointer-events: none; /* Para que no interfiera con clics */
 }
+
+
+
+#logoPrincipal {
+  width: 100%;      /* Por defecto ocupa todo el ancho */
+  height: auto;
+  display: block;
+  margin-bottom: 15px;
+  max-width: 1000px; /* Para que no se pase del ancho máximo del mural */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 769px) {
+  #logoPrincipal {
+    width: 600px;   /* Ajusta este valor al tamaño deseado en desktop */
+  }
+}
