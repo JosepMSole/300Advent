@@ -5,26 +5,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mural Completo</title>
-  <link rel="icon" href="icon/ico.ico" type="image/x-icon" />
   <link rel="stylesheet" href="CSS/STYLESS.css" />
 </head>
 <body>
 
-  <!-- Video de fondo -->
-  <video autoplay muted loop playsinline id="bg-video">
-    <source src="videos/300ADVENT - BG 1.mp4" type="video/mp4" />
-    Tu navegador no soporta videos HTML5.
-  </video>
-
   <!-- Logo principal -->
   <img src="imagenes/300STORIES.png" alt="Logo 300 Stories" id="logoPrincipal" />
 
-  <!-- Aquí el contenido principal -->
-
-  <!-- Desplegable para ordenar -->
+  <!-- Texto fijo "ORDENAR POR:" -->
   <label for="ordenarPor" style="display:block; margin-bottom:8px; font-weight:bold;">
     ORDENAR POR:
   </label>
+  
+  <!-- Select para ordenar -->
   <select id="ordenarPor" style="margin-bottom: 15px; padding: 6px; font-size: 1rem;">
     <option value="" selected disabled>ORDENAR POR</option>
     <option value="numero">Número de Colección</option>
@@ -36,11 +29,24 @@
     <option value="titulo">Título</option>
   </select>
 
-  <!-- Botón para desbloquear -->
-  <button id="desbloquear-todas">🔓 Desbloquear disponibles</button>
+  <!-- Botón "Volver a las Stories" -->
+  <button id="volverStories" type="button" style="
+    border: 5px solid white;
+    background: transparent;
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    display: inline-block;
+  ">Volver a las Stories</button>
 
-  <!-- Botón contador -->
-  <button id="contador-disponibles">0 de 300</button>
+  <!-- Botones desbloquear y contador uno al lado del otro -->
+  <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+    <button id="desbloquear-todas">🔓 Desbloquear disponibles</button>
+    <button id="contador-disponibles">0 de 300</button>
+  </div>
 
   <div class="gallery" id="gallery"></div>
 
@@ -49,11 +55,19 @@
     <span class="close" id="closeModal">&times;</span>
     <div class="modal-wrapper">
       <img class="modal-content" id="modalImage" />
-      <a id="modalLink" href="#" target="_blank" class="modal-link">ACCEDER</a>
+      <a id="modalLink" href="#" class="modal-link">ACCEDER</a>
     </div>
   </div>
 
   <script src="JSON/JSONADVENT.js"></script>
   <script src="JS/main.js"></script>
+
+  <script>
+    // Redirigir al hacer clic en "Volver a las Stories"
+    document.getElementById('volverStories').addEventListener('click', () => {
+      window.location.href = 'https://www.disturbingstories.com/stories.html';
+    });
+  </script>
+
 </body>
 </html>
