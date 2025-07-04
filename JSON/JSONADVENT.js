@@ -1,3 +1,5 @@
+// main.js - actualizado
+
 const totalImagenes = 300;
 const gallery = document.getElementById("gallery");
 const contadorBtn = document.getElementById("contador-disponibles");
@@ -14,11 +16,22 @@ function formatearFechaCompleta(fechaStr, corto = false) {
   return `${day}/${mm}/${yy}`;
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  function cargarMetadataGaleria() {
-    const data = localStorage.getItem("metadataGaleria");
-    return data ? JSON.parse(data) : {};
+async function cargarMetadataGaleria() {
+  try {
+    const res = await fetch("admin/metadata.json");
+    if (!res.ok) throw new Error("No se pudo cargar metadata.json");
+    const data = await res.json();
+    localStorage.setItem("metadataGaleria", JSON.stringify(data));
+    return data;
+  } catch (e) {
+    console.error("Error al cargar metadata:", e);
+    const fallback = localStorage.getItem("metadataGaleria");
+    return fallback ? JSON.parse(fallback) : {};
   }
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  const metadata = await cargarMetadataGaleria();
 
   function formatNumber(n) {
     return String(n).padStart(3, "0");
@@ -27,7 +40,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const imageDivs = [];
   let disponibles = 0;
   let imagenesCargadas = 0;
-  const metadata = cargarMetadataGaleria();
 
   gallery.innerHTML = "";
 
@@ -128,19 +140,10 @@ window.addEventListener("DOMContentLoaded", () => {
       modalLink.style.display = "none";
     }
 
+    // En móvil, los estilos CSS ocultan los metadatos
     const meta = metadata[numero];
     if (meta) {
-      const textoSinopsis = meta.sinopsis || "";
-      const textoCategorias = meta.categorias?.join(", ") || "N/A";
-      const textoAnio = meta.anio ?? "N/A";
-      const textoFecha = formatearFechaCompleta(meta.fecha, true) || "N/A"; // 🔧 fecha corta móvil
-
-      modalMetadata.innerHTML = `
-        <div style="margin-bottom: 10px; font-style: italic;">${textoSinopsis}</div>
-        <div style="margin-bottom: 10px;"><strong>Categorías:</strong> ${textoCategorias}</div>
-        <div style="margin-bottom: 10px;"><strong>Año:</strong> ${textoAnio}</div>
-        <div style="margin-bottom: 10px;"><strong>Fecha Publicación:</strong> ${textoFecha}</div>
-      `;
+      modalMetadata.innerHTML = "";
       modalMetadata.style.display = "block";
     } else {
       modalMetadata.style.display = "none";
@@ -153,7 +156,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   closeModal.onclick = () => (modal.style.display = "none");
-  window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+  window.onclick = (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  };
 
   desbloquearBtn.addEventListener("click", () => {
     imageDivs.forEach(({ div, desbloqueadaRef, setDesbloqueada }) => {
