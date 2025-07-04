@@ -133,33 +133,51 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   function openModal(src) {
-    modal.style.display = "flex";
-    modalImg.src = src;
+  modal.style.display = "flex";
+  modalImg.src = src;
 
-    const numero = src.match(/\/(\d{3})\.jpg$/)?.[1];
+  const numero = src.match(/\/(\d{3})\.jpg$/)?.[1];
 
-    if (numero) {
-      modalLink.href = `https://www.disturbingstories.com/${numero}.html`;
-      modalLink.style.display = "inline-block";
-      modalLink.target = "_self";
-    } else {
-      modalLink.style.display = "none";
-    }
-
-    // En móvil, los estilos CSS ocultan los metadatos
-    const meta = metadata[numero];
-    if (meta) {
-      modalMetadata.innerHTML = "";
-      modalMetadata.style.display = "block";
-    } else {
-      modalMetadata.style.display = "none";
-    }
-
-    const wrapper = document.querySelector(".modal-wrapper");
-    wrapper.style.display = "flex";
-    wrapper.style.alignItems = "flex-start";
-    wrapper.style.gap = "20px";
+  if (numero) {
+    modalLink.href = `https://www.disturbingstories.com/${numero}.html`;
+    modalLink.style.display = "inline-block";
+    modalLink.target = "_self";
+  } else {
+    modalLink.style.display = "none";
   }
+
+  const meta = metadata[numero];
+  if (meta) {
+    const sinopsis = meta.sinopsis || "";
+
+    if (window.innerWidth <= 768) {
+      // SOLO EN SMARTPHONE: mostrar solo sinopsis
+      modalMetadata.innerHTML = `<div style="font-style: italic;">${sinopsis}</div>`;
+    } else {
+      // EN DESKTOP: mostrar sinopsis + categorías + año + fecha
+      const categorias = meta.categorias?.join(", ") || "N/A";
+      const anio = meta.anio ?? "N/A";
+      const fecha = formatearFechaCompleta(meta.fecha, true) || "N/A";
+
+      modalMetadata.innerHTML = `
+        <div style="margin-bottom: 10px; font-style: italic;">${sinopsis}</div>
+        <div style="margin-bottom: 10px;"><strong>Categorías:</strong> ${categorias}</div>
+        <div style="margin-bottom: 10px;"><strong>Año:</strong> ${anio}</div>
+        <div style="margin-bottom: 10px;"><strong>Fecha Publicación:</strong> ${fecha}</div>
+      `;
+    }
+
+    modalMetadata.style.display = "block";
+  } else {
+    modalMetadata.style.display = "none";
+  }
+
+  const wrapper = document.querySelector(".modal-wrapper");
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "flex-start";
+  wrapper.style.gap = "20px";
+}
+
 
   closeModal.onclick = () => (modal.style.display = "none");
   window.onclick = (e) => {
