@@ -367,3 +367,9 @@ body {
 .reducido {
   font-size: 50%;
 }
+
+
+#tablaMetadata {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
