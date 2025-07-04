@@ -33,6 +33,12 @@ async function cargarMetadataGaleria() {
 window.addEventListener("DOMContentLoaded", async () => {
   const metadata = await cargarMetadataGaleria();
 
+  // Activar orden inicial tras unos segundos (por si no se cargan todas las imágenes)
+  setTimeout(() => {
+    ordenarSelect.value = "numero";
+    ordenarYFiltrar();
+  }, 3000);
+
   function formatNumber(n) {
     return String(n).padStart(3, "0");
   }
