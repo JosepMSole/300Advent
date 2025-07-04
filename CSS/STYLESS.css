@@ -2,13 +2,91 @@ body {
   font-family: sans-serif;
   padding: 20px;
   margin: 0;
-  background: transparent;  /* Sin nebulosa ni degradado */
+  background: transparent;
   color: white;
   text-align: center;
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
   z-index: 0;
+}
+
+/* Video de fondo fijo */
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1; /* Detrás de todo */
+  pointer-events: none; /* Para que no interfiera con clics */
+}
+
+/* Logo principal */
+#logoPrincipal {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 15px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 769px) {
+  #logoPrincipal {
+    width: 600px; /* Tamaño más pequeño en desktop */
+  }
+}
+
+/* Contenedor para los botones debajo del desplegable */
+.botonera {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Botones desbloquear y contador */
+#desbloquear-todas,
+#contador-disponibles {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background: #ffeb3b;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+#desbloquear-todas:hover,
+#contador-disponibles:hover {
+  background: #fdd835;
+}
+
+/* Botón Volver a las Stories */
+#volverStories {
+  border: 5px solid white;
+  background: transparent;
+  color: white;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  display: inline-block;
+  white-space: nowrap;
+  transition: background 0.3s, color 0.3s;
+}
+
+#volverStories:hover {
+  background: white;
+  color: black;
 }
 
 /* Galería */
@@ -211,81 +289,4 @@ body {
   animation: none;
   z-index: 2;
   pointer-events: none;
-}
-
-#desbloquear-todas,
-#contador-disponibles {
-  margin: 10px auto 10px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  background: #ffeb3b;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s;
-  display: inline-block;
-}
-
-#desbloquear-todas:hover,
-#contador-disponibles:hover {
-  background: #fdd835;
-}
-
-/* Video de fondo */
-#bg-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: -1; /* Detrás de todo */
-  pointer-events: none; /* Para que no interfiera con clics */
-}
-
-/* Logo principal */
-#logoPrincipal {
-  width: 100%;      /* Por defecto ocupa todo el ancho */
-  height: auto;
-  display: block;
-  margin-bottom: 15px;
-  max-width: 1000px; /* No se pase del ancho máximo del mural */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-@media (min-width: 769px) {
-  #logoPrincipal {
-    width: 600px;   /* Ajusta tamaño en desktop */
-  }
-}
-
-/* Contenedores para orden y botones */
-#containerOrdenarPor {
-  margin-bottom: 15px;
-}
-
-#containerBotones {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-/* Botón "Volver a las Stories" */
-#volverStories {
-  border: 5px solid white;
-  background: transparent;
-  color: white;
-  font-size: 1rem;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background 0.3s;
-}
-
-#volverStories:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
