@@ -140,27 +140,39 @@ window.addEventListener("DOMContentLoaded", () => {
       let textoSinopsis = meta.sinopsis || "";
 
       modalMetadata.innerHTML = `
-        <div style="margin-top: 10px; font-style: italic;">${textoSinopsis}</div>
-        <div><strong>Categorías:</strong> ${textoCategorias}</div>
-        <div><strong>Año:</strong> ${textoAnio}</div>
-        <div><strong>Fecha:</strong> ${textoFecha}</div>
-        <div><strong>Título:</strong> ${textoTitulo}</div>
+        <div style="margin-bottom: 10px; font-style: italic; max-width: 30ch; word-wrap: break-word;">${textoSinopsis}</div>
+        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Categorías:</strong> ${textoCategorias}</div>
+        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Año:</strong> ${textoAnio}</div>
+        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Fecha:</strong> ${textoFecha}</div>
+        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Título:</strong> ${textoTitulo}</div>
       `;
       modalMetadata.style.display = "block";
 
-      // Cambiar posición a debajo de la imagen
-      modalMetadata.style.position = "static";
-      modalMetadata.style.marginTop = "10px";
+      // Colocar metadata a la derecha de la imagen
+      modalMetadata.style.position = "absolute";
+      modalMetadata.style.top = "0";
+      modalMetadata.style.left = "100%";
+      modalMetadata.style.marginLeft = "20px";
+      modalMetadata.style.maxWidth = "30ch"; // aprox 50 caracteres ancho
       modalMetadata.style.color = "#ffeb3b";
       modalMetadata.style.fontSize = "0.9rem";
       modalMetadata.style.fontFamily = "monospace";
       modalMetadata.style.whiteSpace = "normal";
-      modalMetadata.style.maxWidth = "90vw";
-      modalMetadata.style.overflow = "visible";
-      modalMetadata.style.textAlign = "center";
+      modalMetadata.style.textAlign = "left";
+      modalMetadata.style.overflowWrap = "break-word";
+
+      // Ajustar contenedor modal-wrapper para que se acomode lado a lado
+      const wrapper = document.querySelector(".modal-wrapper");
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "flex-start";
+      wrapper.style.gap = "20px";
     } else {
       modalMetadata.style.display = "none";
       modalMetadata.innerHTML = "";
+
+      // Reset modal-wrapper estilo en caso sin metadata
+      const wrapper = document.querySelector(".modal-wrapper");
+      wrapper.style.display = "inline-block";
     }
   }
 
