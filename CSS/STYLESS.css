@@ -11,8 +11,6 @@ body {
   z-index: 0;
 }
 
-/* Eliminado body::before y body::after para quitar nebulosas y líneas */
-
 /* Galería */
 .gallery {
   display: grid;
@@ -246,20 +244,48 @@ body {
   pointer-events: none; /* Para que no interfiera con clics */
 }
 
-
-
+/* Logo principal */
 #logoPrincipal {
   width: 100%;      /* Por defecto ocupa todo el ancho */
   height: auto;
   display: block;
   margin-bottom: 15px;
-  max-width: 1000px; /* Para que no se pase del ancho máximo del mural */
+  max-width: 1000px; /* No se pase del ancho máximo del mural */
   margin-left: auto;
   margin-right: auto;
 }
 
 @media (min-width: 769px) {
   #logoPrincipal {
-    width: 600px;   /* Ajusta este valor al tamaño deseado en desktop */
+    width: 600px;   /* Ajusta tamaño en desktop */
   }
+}
+
+/* Contenedores para orden y botones */
+#containerOrdenarPor {
+  margin-bottom: 15px;
+}
+
+#containerBotones {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* Botón "Volver a las Stories" */
+#volverStories {
+  border: 5px solid white;
+  background: transparent;
+  color: white;
+  font-size: 1rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+#volverStories:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
