@@ -4,15 +4,14 @@ const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
 const ordenarSelect = document.getElementById("ordenarPor");
 
-// Función para formatear fecha "YYYY-MM-DD" a "DD/MMM/YY" en español
-function formatearFecha(fechaStr) {
+// Función para formatear fecha "YYYY-MM-DD" a "DD/MES/YYYY" en español
+function formatearFechaCompleta(fechaStr) {
   if (!fechaStr) return "";
   const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
   const [year, month, day] = fechaStr.split("-");
   if (!year || !month || !day) return fechaStr;
-  const yy = year.slice(2);
   const mm = meses[parseInt(month, 10) - 1] || "";
-  return `${day}/${mm}/${yy}`;
+  return `${day}/${mm}/${year}`;
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -46,12 +45,14 @@ window.addEventListener("DOMContentLoaded", () => {
       div.dataset.anio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "";
       div.dataset.fecha = meta.fecha || "";
       div.dataset.titulo = meta.titulo || "";
+      div.dataset.sinopsis = meta.sinopsis || "";
       div.title = meta.titulo || "";
     } else {
       div.dataset.categorias = "";
       div.dataset.anio = "";
       div.dataset.fecha = "";
       div.dataset.titulo = "";
+      div.dataset.sinopsis = "";
     }
 
     const label = document.createElement("span");
@@ -134,16 +135,29 @@ window.addEventListener("DOMContentLoaded", () => {
     if (meta) {
       let textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
       let textoAnio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "N/A";
-      let textoFecha = meta.fecha || "N/A";
+      let textoFecha = formatearFechaCompleta(meta.fecha) || "N/A";
       let textoTitulo = meta.titulo || "N/A";
+      let textoSinopsis = meta.sinopsis || "";
 
       modalMetadata.innerHTML = `
+        <div style="margin-top: 10px; font-style: italic;">${textoSinopsis}</div>
         <div><strong>Categorías:</strong> ${textoCategorias}</div>
         <div><strong>Año:</strong> ${textoAnio}</div>
         <div><strong>Fecha:</strong> ${textoFecha}</div>
         <div><strong>Título:</strong> ${textoTitulo}</div>
       `;
       modalMetadata.style.display = "block";
+
+      // Cambiar posición a debajo de la imagen
+      modalMetadata.style.position = "static";
+      modalMetadata.style.marginTop = "10px";
+      modalMetadata.style.color = "#ffeb3b";
+      modalMetadata.style.fontSize = "0.9rem";
+      modalMetadata.style.fontFamily = "monospace";
+      modalMetadata.style.whiteSpace = "normal";
+      modalMetadata.style.maxWidth = "90vw";
+      modalMetadata.style.overflow = "visible";
+      modalMetadata.style.textAlign = "center";
     } else {
       modalMetadata.style.display = "none";
       modalMetadata.innerHTML = "";
@@ -270,7 +284,7 @@ window.addEventListener("DOMContentLoaded", () => {
             texto = card.dataset.anio || "";
             break;
           case "fecha":
-            texto = formatearFecha(card.dataset.fecha) || "";
+            texto = formatearFechaCompleta(card.dataset.fecha) || "";
             break;
           case "Terror":
           case "Ciencia Ficción":
