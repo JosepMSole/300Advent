@@ -345,4 +345,20 @@ body {
   color: black;
 }
 
-/* Mantenemos el resto de estilos tal cual para la galería y demás */
+
+
+
+
+
+/* Contador total metadata (estilo para botón o div) */
+#totalMetadataCount {
+  margin: 10px 0 20px 0;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: white;
+}
+
+/* Reducir tamaño texto desde metadata guardada hacia abajo */
+.reducido {
+  font-size: 50%;
+}
