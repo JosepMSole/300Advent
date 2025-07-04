@@ -108,11 +108,10 @@ body {
   .modal-link {
     order: -1;
     position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 0;
+    left: 0;
+    margin: 10px;
     z-index: 999;
-    margin: 0;
   }
 
   .modal-content {
