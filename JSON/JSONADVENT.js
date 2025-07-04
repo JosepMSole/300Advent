@@ -25,6 +25,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const imageDivs = [];
   let disponibles = 0;
+  let imagenesCargadas = 0;
 
   const metadata = cargarMetadataGaleria();
 
@@ -65,6 +66,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     img.onload = () => {
       disponibles++;
+      imagenesCargadas++;
       updateContador();
       div.appendChild(img);
 
@@ -93,7 +95,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      if (disponibles === totalImagenes) {
+      if (imagenesCargadas === totalImagenes) {
         ordenarSelect.value = "numero";
         ordenarYFiltrar();
       }
@@ -101,6 +103,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     img.onerror = () => {
       div.classList.add("locked");
+      imagenesCargadas++;
+      if (imagenesCargadas === totalImagenes) {
+        ordenarSelect.value = "numero";
+        ordenarYFiltrar();
+      }
     };
 
     gallery.appendChild(div);
@@ -137,16 +144,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const meta = metadata[numero];
     if (meta) {
-      let textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
-      let textoAnio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "N/A";
-      let textoFecha = formatearFechaCompleta(meta.fecha) || "N/A";
-      let textoSinopsis = meta.sinopsis || "";
+      const textoSinopsis = meta.sinopsis || "";
+      const textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
+      const textoAnio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "N/A";
+      const textoFecha = formatearFechaCompleta(meta.fecha) || "N/A";
 
       modalMetadata.innerHTML = `
-        <div style="margin-bottom: 10px; font-style: italic; max-width: 30ch; word-wrap: break-word;">${textoSinopsis}</div>
-        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Categorías:</strong> ${textoCategorias}</div>
-        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Año:</strong> ${textoAnio}</div>
-        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Fecha Publicación:</strong> ${textoFecha}</div>
+        <div style="margin-bottom: 10px; font-style: italic;">${textoSinopsis}</div>
+        <div style="margin-bottom: 10px;"><strong>Categorías:</strong> ${textoCategorias}</div>
+        <div style="margin-bottom: 10px;"><strong>Año:</strong> ${textoAnio}</div>
+        <div style="margin-bottom: 10px;"><strong>Fecha Publicación:</strong> ${textoFecha}</div>
       `;
       modalMetadata.style.display = "block";
     } else {
@@ -169,8 +176,6 @@ window.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "none";
     }
   };
-
-  modal.style.display = "none";
 
   desbloquearBtn.addEventListener("click", () => {
     imageDivs.forEach(({ div, desbloqueadaRef, setDesbloqueada }) => {
@@ -195,7 +200,10 @@ window.addEventListener("DOMContentLoaded", () => {
       case "Terror":
       case "Ciencia Ficción":
       case "Oscuras":
-        return div.dataset.categorias?.split(",").map((c) => c.trim()).includes(criterio);
+        return div.dataset.categorias
+          ?.split(",")
+          .map((c) => c.trim())
+          .includes(criterio);
       case "anio":
         return div.dataset.anio !== "" ? parseInt(div.dataset.anio) : null;
       case "fecha":
@@ -288,7 +296,6 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         label.textContent = texto;
         label.style.display = texto ? "block" : "none";
-        label.style.textAlign = "left";
       } else if (label) {
         label.style.display = "none";
       }
