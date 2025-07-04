@@ -95,10 +95,6 @@ body {
 }
 
 @media (max-width: 768px) {
-  .gallery {
-    grid-template-columns: repeat(5, 1fr) !important;
-  }
-
   .modal-wrapper {
     flex-direction: column !important;
     align-items: center !important;
@@ -106,11 +102,11 @@ body {
   }
 
   .modal-content {
-    max-width: 90vw;
-    max-height: 90vh;
+    order: 1;
   }
 
   .modal-metadata {
+    order: 2;
     position: static !important;
     max-width: 90%;
     margin: 0 auto;
@@ -122,6 +118,7 @@ body {
   }
 
   #modalLink {
+    order: 3;
     position: static !important;
     display: inline-block;
     margin: 20px auto 0 auto;
@@ -139,6 +136,7 @@ body {
     background: #fdd835;
   }
 }
+
 
 
 .image-card {
