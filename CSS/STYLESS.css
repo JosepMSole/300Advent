@@ -105,20 +105,28 @@ body {
     gap: 10px !important;
   }
 
-  .modal-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 5;
-    margin: 10px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-  }
-
   .modal-content {
     order: 2;
     max-width: 90vw;
     height: auto;
+  }
+
+  .modal-link {
+    order: 1;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: inline-block;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background: #ffeb3b;
+    color: black;
+    border-radius: 6px;
+    font-weight: bold;
+    z-index: 20;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 
   .modal-metadata {
