@@ -94,59 +94,6 @@ body {
   padding: 0 10px;
 }
 
-@media (max-width: 768px) {
-  .gallery {
-    grid-template-columns: repeat(5, 1fr) !important;
-  }
-
-  .modal-wrapper {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 10px !important;
-    position: relative;
-  }
-
-  .modal-link {
-    order: 0;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 3;
-    font-size: 0.9rem;
-    padding: 6px 12px;
-    border-radius: 6px;
-    background: #ffeb3b;
-    color: black;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background 0.3s;
-  }
-
-  .modal-link:hover {
-    background: #fdd835;
-  }
-
-  .modal-content {
-    order: 1;
-    max-width: 90vw;
-    height: auto;
-  }
-
-  .modal-metadata {
-    order: 2;
-    position: static !important;
-    max-width: 90%;
-    margin: 0 auto;
-    text-align: center;
-    color: #ffeb3b;
-    font-size: 0.75rem;
-    font-family: monospace;
-    line-height: 1.4;
-    padding-bottom: 20px;
-  }
-}
-
-
 .image-card {
   position: relative;
   width: 100%;
@@ -186,7 +133,7 @@ body {
 }
 
 .image-card.locked::after {
-  content: "🔒";
+  content: "\1F512";
   font-size: 2rem;
   color: white;
   position: absolute;
@@ -256,17 +203,17 @@ body {
 
 .modal-link {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  padding: 10px 20px;
+  top: 10px;
+  left: 10px;
+  padding: 6px 12px;
   background: #ffeb3b;
   color: black;
   text-decoration: none;
   border-radius: 6px;
   font-weight: bold;
   transition: background 0.3s;
-  font-size: 1rem;
-  z-index: 2;
+  font-size: 0.9rem;
+  z-index: 3;
 }
 
 .modal-link:hover {
@@ -354,4 +301,58 @@ body {
 #tablaMetadata {
   border-collapse: separate;
   border-spacing: 0 10px;
+}
+
+/* MOBILE OPTIMIZATION MODAL VIEW */
+@media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+
+  .modal-wrapper {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+    position: relative;
+  }
+
+  .modal-link {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #ffeb3b;
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+    width: auto;
+    height: auto;
+  }
+
+  .modal-link:hover {
+    background: #fdd835;
+  }
+
+  .modal-content {
+    order: 1;
+    max-width: 90vw;
+    height: auto;
+  }
+
+  .modal-metadata {
+    order: 2;
+    position: static !important;
+    max-width: 90%;
+    margin: 0 auto;
+    text-align: center;
+    color: #ffeb3b;
+    font-size: 0.75rem;
+    font-family: monospace;
+    line-height: 1.4;
+    padding-bottom: 20px;
+  }
 }
