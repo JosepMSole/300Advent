@@ -4,7 +4,6 @@ const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
 const ordenarSelect = document.getElementById("ordenarPor");
 
-// Función para formatear fecha "YYYY-MM-DD" a "DD/MES/YYYY" en español
 function formatearFechaCompleta(fechaStr) {
   if (!fechaStr) return "";
   const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
@@ -93,6 +92,11 @@ window.addEventListener("DOMContentLoaded", () => {
           openModal(img.src);
         }
       });
+
+      if (disponibles === totalImagenes) {
+        ordenarSelect.value = "numero";
+        ordenarYFiltrar();
+      }
     };
 
     img.onerror = () => {
@@ -126,7 +130,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (numero) {
       modalLink.href = `https://www.disturbingstories.com/${numero}.html`;
       modalLink.style.display = "inline-block";
-      modalLink.target = "_self"; // Abrir en misma pestaña
+      modalLink.target = "_self";
     } else {
       modalLink.style.display = "none";
     }
@@ -136,44 +140,24 @@ window.addEventListener("DOMContentLoaded", () => {
       let textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
       let textoAnio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "N/A";
       let textoFecha = formatearFechaCompleta(meta.fecha) || "N/A";
-      let textoTitulo = meta.titulo || "N/A";
       let textoSinopsis = meta.sinopsis || "";
 
       modalMetadata.innerHTML = `
         <div style="margin-bottom: 10px; font-style: italic; max-width: 30ch; word-wrap: break-word;">${textoSinopsis}</div>
         <div style="max-width: 30ch; word-wrap: break-word;"><strong>Categorías:</strong> ${textoCategorias}</div>
         <div style="max-width: 30ch; word-wrap: break-word;"><strong>Año:</strong> ${textoAnio}</div>
-        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Fecha:</strong> ${textoFecha}</div>
-        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Título:</strong> ${textoTitulo}</div>
+        <div style="max-width: 30ch; word-wrap: break-word;"><strong>Fecha Publicación:</strong> ${textoFecha}</div>
       `;
       modalMetadata.style.display = "block";
-
-      // Colocar metadata a la derecha de la imagen
-      modalMetadata.style.position = "absolute";
-      modalMetadata.style.top = "0";
-      modalMetadata.style.left = "100%";
-      modalMetadata.style.marginLeft = "20px";
-      modalMetadata.style.maxWidth = "30ch"; // aprox 50 caracteres ancho
-      modalMetadata.style.color = "#ffeb3b";
-      modalMetadata.style.fontSize = "0.9rem";
-      modalMetadata.style.fontFamily = "monospace";
-      modalMetadata.style.whiteSpace = "normal";
-      modalMetadata.style.textAlign = "left";
-      modalMetadata.style.overflowWrap = "break-word";
-
-      // Ajustar contenedor modal-wrapper para que se acomode lado a lado
-      const wrapper = document.querySelector(".modal-wrapper");
-      wrapper.style.display = "flex";
-      wrapper.style.alignItems = "flex-start";
-      wrapper.style.gap = "20px";
     } else {
       modalMetadata.style.display = "none";
       modalMetadata.innerHTML = "";
-
-      // Reset modal-wrapper estilo en caso sin metadata
-      const wrapper = document.querySelector(".modal-wrapper");
-      wrapper.style.display = "inline-block";
     }
+
+    const wrapper = document.querySelector(".modal-wrapper");
+    wrapper.style.display = "flex";
+    wrapper.style.alignItems = "flex-start";
+    wrapper.style.gap = "20px";
   }
 
   closeModal.onclick = () => {
@@ -211,10 +195,7 @@ window.addEventListener("DOMContentLoaded", () => {
       case "Terror":
       case "Ciencia Ficción":
       case "Oscuras":
-        return div.dataset.categorias
-          ?.split(",")
-          .map((c) => c.trim())
-          .includes(criterio);
+        return div.dataset.categorias?.split(",").map((c) => c.trim()).includes(criterio);
       case "anio":
         return div.dataset.anio !== "" ? parseInt(div.dataset.anio) : null;
       case "fecha":
@@ -273,7 +254,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     cards.forEach((card) => {
-      // Mostrar u ocultar número colección según criterio
       const numeroSpan = card.querySelector("span");
       if (criterio === "numero") {
         numeroSpan.style.display = "block";
@@ -316,8 +296,4 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   ordenarSelect.addEventListener("change", ordenarYFiltrar);
-
-  // Ordenar inicialmente por número
-  ordenarSelect.value = "numero";
-  ordenarYFiltrar();
 });
