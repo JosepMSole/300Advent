@@ -28,7 +28,6 @@ window.addEventListener("DOMContentLoaded", () => {
   let imagenesCargadas = 0;
 
   const metadata = cargarMetadataGaleria();
-
   gallery.innerHTML = "";
 
   for (let i = 1; i <= totalImagenes; i++) {
@@ -64,9 +63,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
     let desbloqueada = false;
 
+    function checkCargaCompleta() {
+      imagenesCargadas++;
+      if (imagenesCargadas === totalImagenes) {
+        ordenarSelect.value = "numero";
+        ordenarYFiltrar();
+      }
+    }
+
     img.onload = () => {
       disponibles++;
-      imagenesCargadas++;
       updateContador();
       div.appendChild(img);
 
@@ -95,19 +101,12 @@ window.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      if (imagenesCargadas === totalImagenes) {
-        ordenarSelect.value = "numero";
-        ordenarYFiltrar();
-      }
+      checkCargaCompleta();
     };
 
     img.onerror = () => {
       div.classList.add("locked");
-      imagenesCargadas++;
-      if (imagenesCargadas === totalImagenes) {
-        ordenarSelect.value = "numero";
-        ordenarYFiltrar();
-      }
+      checkCargaCompleta();
     };
 
     gallery.appendChild(div);
