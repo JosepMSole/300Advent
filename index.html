@@ -6,35 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mural Completo</title>
   <link rel="stylesheet" href="CSS/STYLESS.css" />
-  <style>
-    /* Ajuste para que el logo ocupe el ancho completo y mantenga proporción */
-    #logo {
-      display: block;
-      width: 100%;
-      max-width: 600px; /* o lo que prefieras */
-      height: auto;
-      margin: 10px auto;
-    }
-    /* Estilo para la frase */
-    #fraseOrdenacion {
-      font-style: italic;
-      color: #ffeb3b;
-      font-weight: 600;
-      margin: 10px 0 15px 0;
-      min-height: 1.2em;
-    }
-  </style>
 </head>
 <body>
 
-  <!-- Logo principal arriba -->
-  <img id="logo" src="imagenes/300STORIES.png" alt="Logo 300 Stories" />
+  <!-- Video de fondo -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="videos/300ADVENT - BG 1.mp4" type="video/mp4" />
+    Tu navegador no soporta videos HTML5.
+  </video>
 
+  <!-- Aquí el contenido principal -->
+  
   <!-- Desplegable para ordenar -->
   <label for="ordenarPor" style="display:block; margin-bottom:8px; font-weight:bold;">
     ORDENAR POR:
   </label>
-  <select id="ordenarPor" style="margin-bottom: 5px; padding: 6px; font-size: 1rem;">
+  <select id="ordenarPor" style="margin-bottom: 15px; padding: 6px; font-size: 1rem;">
     <option value="" selected disabled>ORDENAR POR</option>
     <option value="numero">Número de Colección</option>
     <option value="Terror">Terror</option>
@@ -44,9 +31,6 @@
     <option value="fecha">Fecha de Publicación</option>
     <option value="titulo">Título</option>
   </select>
-
-  <!-- Frase dinámica de ordenación -->
-  <div id="fraseOrdenacion"></div>
 
   <!-- Botón para desbloquear -->
   <button id="desbloquear-todas">🔓 Desbloquear disponibles</button>
