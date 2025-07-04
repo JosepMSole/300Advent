@@ -41,7 +41,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (metadata[numero]) {
       const meta = metadata[numero];
       div.dataset.categorias = meta.categorias ? meta.categorias.join(",") : "";
-      div.dataset.anio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "";
+      div.dataset.anio = meta.anio ?? "";
       div.dataset.fecha = meta.fecha || "";
       div.dataset.titulo = meta.titulo || "";
       div.dataset.sinopsis = meta.sinopsis || "";
@@ -75,6 +75,7 @@ window.addEventListener("DOMContentLoaded", () => {
       disponibles++;
       updateContador();
       div.appendChild(img);
+      gallery.appendChild(div);
 
       imageDivs.push({
         div,
@@ -106,10 +107,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
     img.onerror = () => {
       div.classList.add("locked");
+      gallery.appendChild(div);
+
+      imageDivs.push({
+        div,
+        img: null,
+        desbloqueadaRef: () => false,
+        setDesbloqueada: () => {}
+      });
+
       checkCargaCompleta();
     };
-
-    gallery.appendChild(div);
   }
 
   function updateContador() {
@@ -145,7 +153,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (meta) {
       const textoSinopsis = meta.sinopsis || "";
       const textoCategorias = meta.categorias ? meta.categorias.join(", ") : "N/A";
-      const textoAnio = meta.anio !== null && meta.anio !== undefined ? meta.anio : "N/A";
+      const textoAnio = meta.anio ?? "N/A";
       const textoFecha = formatearFechaCompleta(meta.fecha) || "N/A";
 
       modalMetadata.innerHTML = `
@@ -288,4 +296,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   ordenarSelect.addEventListener("change", ordenarYFiltrar);
+
+  // 🚫 FORZAMOS OCULTAR MODAL al cargar
+  modal.style.display = "none";
 });
