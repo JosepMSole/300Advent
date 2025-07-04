@@ -125,6 +125,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (numero) {
       modalLink.href = `https://www.disturbingstories.com/${numero}.html`;
       modalLink.style.display = "inline-block";
+      modalLink.target = "_self"; // Abrir en misma pestaña
     } else {
       modalLink.style.display = "none";
     }
