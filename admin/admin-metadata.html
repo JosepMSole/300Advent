@@ -8,7 +8,7 @@
   body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
   label { display: block; margin-top: 10px; }
   input, select, textarea { width: 100%; padding: 6px; box-sizing: border-box; }
-  button { margin-top: 10px; padding: 10px; }
+  button { margin-top: 10px; padding: 10px; cursor: pointer; }
   .mensaje { margin-top: 10px; color: green; }
   table { margin-top: 20px; width: 100%; border-collapse: collapse; }
   th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
@@ -40,10 +40,11 @@
   <label>Título: 
     <input type="text" id="titulo" />
   </label>
+  <label>Sinopsis:
+    <textarea id="sinopsis" rows="3" placeholder="Breve sinopsis"></textarea>
+  </label>
   <button type="submit">Guardar metadata</button>
 </form>
-
-<button id="exportarJSON" type="button">Exportar metadata JSON</button>
 
 <div class="mensaje" id="mensaje"></div>
 
@@ -56,11 +57,17 @@
       <th>Año</th>
       <th>Fecha</th>
       <th>Título</th>
+      <th>Sinopsis</th>
       <th>Acciones</th>
     </tr>
   </thead>
   <tbody></tbody>
 </table>
+
+<!-- Botón Exportar JSON al pie -->
+<div style="margin-top: 20px; text-align: center;">
+  <button id="exportarJSON" type="button">Exportar metadata JSON</button>
+</div>
 
 <script>
   const form = document.getElementById('formMetadata');
@@ -83,6 +90,7 @@
     for (const id in data) {
       const item = data[id];
       const categoriasStr = item.categorias.join(', ');
+      const sinopsisStr = item.sinopsis ? item.sinopsis : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${id}</td>
@@ -90,6 +98,7 @@
         <td>${item.anio || ''}</td>
         <td>${item.fecha || ''}</td>
         <td>${item.titulo || ''}</td>
+        <td>${sinopsisStr}</td>
         <td><button data-id="${id}" class="borrarBtn">Borrar</button></td>
       `;
       tablaBody.appendChild(tr);
@@ -113,9 +122,10 @@
     const anio = form.anio.value ? parseInt(form.anio.value) : null;
     const fecha = form.fecha.value;
     const titulo = form.titulo.value.trim();
+    const sinopsis = form.sinopsis.value.trim();
 
     const data = cargarMetadata();
-    data[id] = { categorias, anio, fecha, titulo };
+    data[id] = { categorias, anio, fecha, titulo, sinopsis };
     guardarMetadata(data);
 
     mensaje.textContent = `Metadata para imagen ${id} guardada.`;
