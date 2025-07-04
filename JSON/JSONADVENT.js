@@ -1,29 +1,25 @@
-
 const totalImagenes = 300;
 const gallery = document.getElementById("gallery");
 const contadorBtn = document.getElementById("contador-disponibles");
 const desbloquearBtn = document.getElementById("desbloquear-todas");
 const ordenarSelect = document.getElementById("ordenarPor");
 
-function formatearFechaCompleta(fechaStr) {
+function formatearFechaCompleta(fechaStr, corto = false) {
   if (!fechaStr) return "";
   const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
   const [year, month, day] = fechaStr.split("-");
   if (!year || !month || !day) return fechaStr;
   const mm = meses[parseInt(month, 10) - 1] || "";
-  return `${day}/${mm}/${year}`;
+  const yy = corto ? year.slice(-2) : year;
+  return `${day}/${mm}/${yy}`;
 }
 
-async function cargarMetadataExterna() {
-  const response = await fetch("https://josepmsole.github.io/300Advent/admin/metadata.json");
-  if (!response.ok) {
-    console.error("Error cargando metadata externa");
-    return {};
+window.addEventListener("DOMContentLoaded", () => {
+  function cargarMetadataGaleria() {
+    const data = localStorage.getItem("metadataGaleria");
+    return data ? JSON.parse(data) : {};
   }
-  return await response.json();
-}
 
-window.addEventListener("DOMContentLoaded", async () => {
   function formatNumber(n) {
     return String(n).padStart(3, "0");
   }
@@ -31,7 +27,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const imageDivs = [];
   let disponibles = 0;
   let imagenesCargadas = 0;
-  const metadata = await cargarMetadataExterna();
+  const metadata = cargarMetadataGaleria();
 
   gallery.innerHTML = "";
 
@@ -121,6 +117,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   function openModal(src) {
     modal.style.display = "flex";
     modalImg.src = src;
+
     const numero = src.match(/\/(\d{3})\.jpg$/)?.[1];
 
     if (numero) {
@@ -133,11 +130,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     const meta = metadata[numero];
     if (meta) {
+      const textoSinopsis = meta.sinopsis || "";
+      const textoCategorias = meta.categorias?.join(", ") || "N/A";
+      const textoAnio = meta.anio ?? "N/A";
+      const textoFecha = formatearFechaCompleta(meta.fecha, true) || "N/A"; // 🔧 fecha corta móvil
+
       modalMetadata.innerHTML = `
-        <div style="margin-bottom: 10px; font-style: italic;">${meta.sinopsis || ""}</div>
-        <div style="margin-bottom: 10px;"><strong>Categorías:</strong> ${meta.categorias?.join(", ") || "N/A"}</div>
-        <div style="margin-bottom: 10px;"><strong>Año:</strong> ${meta.anio ?? "N/A"}</div>
-        <div style="margin-bottom: 10px;"><strong>Fecha Publicación:</strong> ${formatearFechaCompleta(meta.fecha) || "N/A"}</div>
+        <div style="margin-bottom: 10px; font-style: italic;">${textoSinopsis}</div>
+        <div style="margin-bottom: 10px;"><strong>Categorías:</strong> ${textoCategorias}</div>
+        <div style="margin-bottom: 10px;"><strong>Año:</strong> ${textoAnio}</div>
+        <div style="margin-bottom: 10px;"><strong>Fecha Publicación:</strong> ${textoFecha}</div>
       `;
       modalMetadata.style.display = "block";
     } else {
@@ -174,8 +176,8 @@ window.addEventListener("DOMContentLoaded", async () => {
       case "Terror":
       case "Ciencia Ficción":
       case "Oscuras":
-        return div.dataset.categorias?.split(",").map((c) => c.trim()).includes(criterio);
-      case "anio": return div.dataset.anio ? parseInt(div.dataset.anio) : null;
+        return div.dataset.categorias?.split(",").map(c => c.trim()).includes(criterio);
+      case "anio": return div.dataset.anio !== "" ? parseInt(div.dataset.anio) : null;
       case "fecha": return div.dataset.fecha ? new Date(div.dataset.fecha).getTime() : null;
       case "titulo": return div.dataset.titulo?.toLowerCase() || null;
       default: return null;
@@ -184,21 +186,20 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   function ordenarYFiltrar() {
     const criterio = ordenarSelect.value;
-    let filtrados = [...imageDivs];
+
+    let filtrados = imageDivs.filter(({ div }) => {
+      const val = getMetadataValue(div, criterio);
+      return val !== null && val !== "" && val !== false;
+    });
 
     if (["numero", "anio", "fecha", "titulo"].includes(criterio)) {
-      filtrados = filtrados.filter(({ div }) => {
-        const val = getMetadataValue(div, criterio);
-        return val !== null && val !== "" && val !== false;
-      });
-
       filtrados.sort((a, b) => {
         const valA = getMetadataValue(a.div, criterio);
         const valB = getMetadataValue(b.div, criterio);
         return valA < valB ? -1 : valA > valB ? 1 : 0;
       });
     } else if (["Terror", "Ciencia Ficción", "Oscuras"].includes(criterio)) {
-      filtrados = filtrados.filter(({ div }) => getMetadataValue(div, criterio));
+      filtrados = imageDivs.filter(({ div }) => getMetadataValue(div, criterio));
     }
 
     gallery.innerHTML = "";
@@ -208,20 +209,22 @@ window.addEventListener("DOMContentLoaded", async () => {
 
       const labelClass = "metadata-label";
       let label = div.querySelector(`.${labelClass}`);
-      if (criterio !== "numero" && criterio !== "titulo") {
+
+      const noLabel = ["numero", "titulo", "Terror", "Ciencia Ficción", "Oscuras"].includes(criterio);
+
+      if (!noLabel) {
         if (!label) {
           label = document.createElement("div");
           label.classList.add(labelClass);
           div.appendChild(label);
         }
+
         let texto = "";
         switch (criterio) {
           case "anio": texto = div.dataset.anio || ""; break;
-          case "fecha": texto = formatearFechaCompleta(div.dataset.fecha) || ""; break;
-          case "Terror":
-          case "Ciencia Ficción":
-          case "Oscuras": texto = criterio; break;
+          case "fecha": texto = formatearFechaCompleta(div.dataset.fecha, true) || ""; break;
         }
+
         label.textContent = texto;
         label.style.display = texto ? "block" : "none";
       } else if (label) {
