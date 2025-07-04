@@ -11,7 +11,6 @@ body {
   z-index: 0;
 }
 
-/* Video de fondo fijo */
 #bg-video {
   position: fixed;
   top: 0;
@@ -19,11 +18,10 @@ body {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  z-index: -1; /* Detrás de todo */
-  pointer-events: none; /* Para que no interfiera con clics */
+  z-index: -1;
+  pointer-events: none;
 }
 
-/* Logo principal */
 #logoPrincipal {
   width: 100%;
   height: auto;
@@ -36,11 +34,10 @@ body {
 
 @media (min-width: 769px) {
   #logoPrincipal {
-    width: 600px; /* Tamaño más pequeño en desktop */
+    width: 600px;
   }
 }
 
-/* Contenedor para los botones debajo del desplegable */
 .botonera {
   display: flex;
   justify-content: center;
@@ -49,7 +46,6 @@ body {
   flex-wrap: wrap;
 }
 
-/* Botones desbloquear y contador */
 #desbloquear-todas,
 #contador-disponibles {
   padding: 10px 20px;
@@ -69,7 +65,6 @@ body {
   background: #fdd835;
 }
 
-/* Botón Volver a las Stories */
 #volverStories {
   border: 5px solid white;
   background: transparent;
@@ -89,7 +84,6 @@ body {
   color: black;
 }
 
-/* Galería */
 .gallery {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -101,13 +95,17 @@ body {
 }
 
 @media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
   .modal-metadata {
-    position: static; /* quitamos absolute */
+    position: static;
     max-width: 100%;
     margin-left: 0;
     max-height: none;
     overflow-y: visible;
-    padding-top: 10px; /* un poco de espacio arriba */
+    padding-top: 10px;
   }
 }
 
@@ -203,7 +201,9 @@ body {
 
 .modal-wrapper {
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
 }
 
 .modal-content {
@@ -238,12 +238,11 @@ body {
 .modal-metadata {
   position: absolute;
   top: 0;
-  left: 100%; /* a la derecha */
+  left: 100%;
   margin-left: 15px;
   max-width: 300px;
   color: #ffeb3b;
   font-size: 0.9rem;
-  font-weight: normal;
   font-family: monospace;
   white-space: normal;
   overflow-wrap: break-word;
@@ -254,6 +253,7 @@ body {
   gap: 8px;
   max-height: 90vh;
   overflow-y: auto;
+  text-align: left;
 }
 
 .close {
@@ -297,66 +297,11 @@ body {
   pointer-events: none;
 }
 
-
-
-/* Video fondo fijo */
-#bg-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: -1; /* detrás de todo */
-  pointer-events: none; /* no interfiere con clicks */
-}
-
-/* Logo principal */
-#logoPrincipal {
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  margin: 0 auto 15px auto;
-  display: block;
-}
-
-/* Contenedor botones desbloquear y contador */
-.botonera {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-/* Botón Volver a las Stories */
 .volver-container {
   text-align: center;
   margin: 30px 0 50px 0;
 }
 
-#volverStories {
-  border: 5px solid white;
-  background: transparent;
-  color: white;
-  font-size: 1rem;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: inline-block;
-  transition: background 0.3s, color 0.3s;
-}
-
-#volverStories:hover {
-  background: white;
-  color: black;
-}
-
-
-
-
-
-
-/* Contador total metadata (estilo para botón o div) */
 #totalMetadataCount {
   margin: 10px 0 20px 0;
   font-weight: bold;
@@ -364,11 +309,9 @@ body {
   color: white;
 }
 
-/* Reducir tamaño texto desde metadata guardada hacia abajo */
 .reducido {
   font-size: 50%;
 }
-
 
 #tablaMetadata {
   border-collapse: separate;
