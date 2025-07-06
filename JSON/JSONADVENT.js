@@ -37,7 +37,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   setTimeout(() => {
     ordenarSelect.value = "numero";
     ordenarYFiltrar();
-  }, 1200);
+  }, 750);
 
   function formatNumber(n) {
     return String(n).padStart(3, "0");
