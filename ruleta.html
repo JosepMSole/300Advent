@@ -2,31 +2,418 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Ruleta de Historias (DEBUG)</title>
+  <title>Ruleta de Historias - Disturbing Stories</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --card-bg: #111827;
+      --accent: #e11d48;
+      --accent-soft: rgba(225, 17, 72, 0.15);
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --border: #1f2937;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.7);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 420px;
+      width: 100%;
+    }
+
+    #story-widget {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(17, 24, 39, 0.98));
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #story-widget::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(225, 29, 72, 0.35), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(59, 130, 246, 0.25), transparent 60%);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .widget-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .title-row .icon {
+      font-size: 18px;
+      filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.9));
+    }
+
+    .widget-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(156, 163, 175, 0.6);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #4ade80 0, #16a34a 60%);
+      box-shadow: 0 0 8px rgba(74, 222, 128, 0.9);
+    }
+
+    .status-line {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* --- Bombo / Ruleta --- */
+
+    .drum-row {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #030712 100%);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .drum-image-wrapper {
+      flex: 0 0 30%;        /* aprox. una cuarta parte del ancho */
+      max-width: 120px;     /* tamaño máximo de la imagen */
+      border-radius: 14px;
+      overflow: hidden;
+      background: #020617;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
+      position: relative;
+    }
+
+    .drum-image-wrapper::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      box-shadow:
+        inset 0 0 18px rgba(0, 0, 0, 0.85),
+        inset 0 0 2px rgba(148, 163, 184, 0.4);
+      pointer-events: none;
+    }
+
+    #preview-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+      transform-origin: center;
+      transition: transform 100ms linear;
+    }
+
+    .drum-row.spinning #preview-image {
+      animation: pulseZoom 0.35s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseZoom {
+      from { transform: scale(1.03); }
+      to   { transform: scale(1.08); }
+    }
+
+    .drum-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #preview-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #preview-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* --- Controles --- */
+
+    .controls-row {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 0;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition:
+        background var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        opacity var(--transition-fast),
+        filter var(--transition-fast);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+      box-shadow: none;
+      filter: grayscale(0.3);
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at 0 0, #f97316 0, #e11d48 45%, #7f1d1d 100%);
+      color: #f9fafb;
+      box-shadow: 0 10px 25px rgba(220, 38, 38, 0.6);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.9);
+    }
+
+    .btn:not(:disabled):active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.8);
+    }
+
+    /* --- Historia seleccionada --- */
+
+    .selected-story {
+      margin-top: 14px;
+      padding: 10px 10px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 64, 175, 0.45));
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .selected-story.hidden {
+      display: none;
+    }
+
+    .selected-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    #selected-image {
+      flex: 0 0 30%;
+      max-width: 110px;     /* imagen pequeña, ~1/4 del contenedor */
+      border-radius: 12px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75);
+      background: #020617;
+    }
+
+    .selected-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    #selected-title {
+      font-size: 14px;
+      margin: 0 0 4px;
+    }
+
+    #selected-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .meta-pill {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+    }
+
+    .meta-tag {
+      background: var(--accent-soft);
+      border-color: transparent;
+      color: #fecaca;
+    }
+
+    #selected-synopsis {
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0 0 6px;
+      color: #e5e7eb;
+    }
+
+    #read-link {
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.4);
+      text-decoration: none;
+      color: #f9fafb;
+      background: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.6), rgba(15, 23, 42, 0.95));
+      transition:
+        background var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    #read-link:hover {
+      transform: translateY(-0.5px);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.9);
+    }
+
+    @media (max-width: 480px) {
+      .selected-inner {
+        flex-direction: row;
+      }
+    }
+  </style>
 </head>
-<body style="background:#ffffff; color:#000; font-family:sans-serif;">
 
-  <h1>Ruleta de historias (modo debug)</h1>
-  <p>Si ves este texto, el HTML se ha cargado correctamente.</p>
+<body>
+  <div class="app">
+    <div id="story-widget">
+      <div class="widget-header">
+        <div class="widget-title">
+          <div class="title-row">
+            <span class="icon">🩸</span>
+            <span>Disturbing Stories</span>
+          </div>
+          <div class="widget-subtitle">Ruleta de historias aleatorias</div>
+        </div>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>Activo</span>
+        </div>
+      </div>
 
-  <p><strong>Estado:</strong> <span id="status">Cargando historias...</span></p>
+      <div class="drum-row" id="drum-row">
+        <div class="drum-image-wrapper">
+          <img id="preview-image" src="" alt="Historia aleatoria" />
+        </div>
+        <div class="drum-info">
+          <div id="preview-title">Pulsa «Girar» para empezar.</div>
+          <div id="preview-subtitle">Mientras la ruleta gira, no sabrás qué historia saldrá…</div>
+        </div>
+      </div>
 
-  <div id="preview" style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-    <p><strong>Historia en bombo:</strong> <span id="preview-title">–</span></p>
-    <img id="preview-image" src="" alt="Imagen de historia" style="max-width:100%; height:auto; background:#eee;">
-  </div>
+      <div class="controls-row">
+        <button id="start-button" class="btn btn-primary" disabled>
+          🎲 Girar
+        </button>
+        <button id="stop-button" class="btn btn-secondary" disabled>
+          ✋ Detener
+        </button>
+      </div>
 
-  <button id="toggle-button" disabled>⏳ Cargando…</button>
+      <div id="status" class="status-line"></div>
 
-  <div id="selected" style="margin-top:20px; padding:10px; border:1px solid #ccc; display:none;">
-    <h2 id="selected-title"></h2>
-    <p id="selected-synopsis"></p>
-    <p><a id="selected-link" href="#" target="_blank">📖 Leer historia</a></p>
+      <div id="selected-story" class="selected-story hidden">
+        <div class="selected-inner">
+          <img id="selected-image" src="" alt="Historia seleccionada" />
+          <div class="selected-content">
+            <div class="label">Historia seleccionada</div>
+            <h3 id="selected-title"></h3>
+            <div id="selected-meta"></div>
+            <p id="selected-synopsis"></p>
+            <a id="read-link" href="#" target="_blank" rel="noopener noreferrer">
+              <span>📖</span>
+              <span>Leer historia completa</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Rutas para GitHub Pages (y también valen en local si sirves con http)
+    // Rutas (válidas en GitHub Pages y en local con servidor http)
     const STORIES_URL = "admin/metadata.json";
     const IMAGE_BASE_PATH = "imagenes/";
     const STORY_URL_BASE = "https://www.disturbingstories.com/";
@@ -37,60 +424,71 @@
     let currentIndex = -1;
 
     const statusEl = document.getElementById("status");
-    const previewTitleEl = document.getElementById("preview-title");
+    const drumRowEl = document.getElementById("drum-row");
     const previewImgEl = document.getElementById("preview-image");
-    const btnEl = document.getElementById("toggle-button");
-    const selectedBoxEl = document.getElementById("selected");
+    const previewTitleEl = document.getElementById("preview-title");
+    const previewSubtitleEl = document.getElementById("preview-subtitle");
+    const startBtn = document.getElementById("start-button");
+    const stopBtn = document.getElementById("stop-button");
+
+    const selectedBoxEl = document.getElementById("selected-story");
+    const selectedImageEl = document.getElementById("selected-image");
     const selectedTitleEl = document.getElementById("selected-title");
+    const selectedMetaEl = document.getElementById("selected-meta");
     const selectedSynopsisEl = document.getElementById("selected-synopsis");
-    const selectedLinkEl = document.getElementById("selected-link");
+    const readLinkEl = document.getElementById("read-link");
 
     async function loadStories() {
       try {
-        statusEl.textContent = "Haciendo fetch a " + STORIES_URL + "...";
+        statusEl.textContent = "Cargando historias…";
 
         const res = await fetch(STORIES_URL);
         if (!res.ok) {
-          throw new Error("Respuesta HTTP no OK: " + res.status + " " + res.statusText);
+          throw new Error("No se ha encontrado admin/metadata.json (" + res.status + ")");
         }
 
         const data = await res.json();
-        console.log("JSON cargado:", data);
 
         stories = Object.entries(data).map(([id, item]) => ({
           id,
-          title: item.titulo,
-          synopsis: item.sinopsis,
+          title: item.titulo || "Historia sin título",
+          synopsis: item.sinopsis || "",
+          year: item.anio || "",
+          categories: Array.isArray(item.categorias) ? item.categorias : [],
           image: IMAGE_BASE_PATH + id + ".jpg",
           url: STORY_URL_BASE + id + ".html"
         }));
 
         if (stories.length === 0) {
-          throw new Error("metadata.json está vacío o sin historias.");
+          throw new Error("metadata.json está vacío.");
         }
 
         currentIndex = 0;
         updatePreview(stories[currentIndex]);
 
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
         statusEl.textContent = "Historias cargadas: " + stories.length;
-        btnEl.disabled = false;
-        btnEl.textContent = "🎲 Empezar";
 
       } catch (e) {
         console.error("Error cargando historias:", e);
-        statusEl.textContent = "ERROR al cargar historias: " + e.message;
-        btnEl.disabled = true;
+        statusEl.textContent = "ERROR: " + e.message;
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        previewTitleEl.textContent = "No se han podido cargar las historias.";
+        previewSubtitleEl.textContent = "Revisa la ruta y el formato de admin/metadata.json.";
       }
     }
 
     function updatePreview(story) {
-      previewTitleEl.textContent = story.title + " (ID: " + story.id + ")";
       previewImgEl.src = story.image;
+      previewImgEl.alt = story.title;
+      previewTitleEl.textContent = story.title + " (ID: " + story.id + ")";
     }
 
     function getRandomIndex() {
-      let idx;
       if (stories.length === 1) return 0;
+      let idx;
       do {
         idx = Math.floor(Math.random() * stories.length);
       } while (idx === currentIndex);
@@ -99,9 +497,14 @@
     }
 
     function startSpinning() {
+      if (spinning || stories.length === 0) return;
       spinning = true;
-      selectedBoxEl.style.display = "none";
-      btnEl.textContent = "✋ Detener";
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      selectedBoxEl.classList.add("hidden");
+      previewSubtitleEl.textContent = "La ruleta está girando…";
+
+      drumRowEl.classList.add("spinning");
 
       intervalId = setInterval(() => {
         const idx = getRandomIndex();
@@ -110,24 +513,49 @@
     }
 
     function stopSpinning() {
+      if (!spinning) return;
       spinning = false;
-      clearInterval(intervalId);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      previewSubtitleEl.textContent = "Esta es la historia que ha tocado.";
+      drumRowEl.classList.remove("spinning");
+
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
 
       const story = stories[currentIndex];
       updatePreview(story);
-
-      selectedTitleEl.textContent = story.title + " (ID: " + story.id + ")";
-      selectedSynopsisEl.textContent = story.synopsis;
-      selectedLinkEl.href = story.url;
-      selectedBoxEl.style.display = "block";
-
-      btnEl.textContent = "🎲 Volver a girar";
+      showSelectedStory(story);
     }
 
-    btnEl.addEventListener("click", () => {
-      if (!spinning) startSpinning();
-      else stopSpinning();
-    });
+    function showSelectedStory(story) {
+      selectedImageEl.src = story.image;
+      selectedImageEl.alt = story.title;
+      selectedTitleEl.textContent = story.title;
+
+      const metaParts = [];
+
+      if (story.year) {
+        metaParts.push('<span class="meta-pill">' + story.year + '</span>');
+      }
+
+      if (story.categories && story.categories.length > 0) {
+        story.categories.forEach(cat => {
+          metaParts.push('<span class="meta-pill meta-tag">' + cat + '</span>');
+        });
+      }
+
+      selectedMetaEl.innerHTML = metaParts.join("");
+      selectedSynopsisEl.textContent = story.synopsis;
+      readLinkEl.href = story.url;
+
+      selectedBoxEl.classList.remove("hidden");
+    }
+
+    startBtn.addEventListener("click", startSpinning);
+    stopBtn.addEventListener("click", stopSpinning);
 
     loadStories();
   </script>
