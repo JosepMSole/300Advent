@@ -20,9 +20,7 @@
       --transition-fast: 0.18s ease-out;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -68,7 +66,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .widget-title {
@@ -124,10 +122,36 @@
       margin-top: 6px;
     }
 
+    /* Filtro de categoría */
+    .filter-row {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .filter-row label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .filter-row select {
+      flex: 1;
+      padding: 4px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      font-size: 11px;
+      outline: none;
+    }
+
     /* --- Bombo / Ruleta --- */
 
     .drum-row {
-      margin-top: 12px;
+      margin-top: 10px;
       padding: 10px;
       border-radius: var(--radius-lg);
       background: radial-gradient(circle at top, #020617 0, #020617 55%, #030712 100%);
@@ -326,13 +350,13 @@
       color: #e5e7eb;
     }
 
-    /* Botón de leer historia más grande */
+    /* Botón leer historia más grande */
     #read-link {
-      font-size: 13px;              /* más grande */
+      font-size: 13px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 16px;           /* doble padding ≈ doble tamaño visual */
+      padding: 10px 16px;
       border-radius: 999px;
       border: 1px solid rgba(248, 250, 252, 0.4);
       text-decoration: none;
@@ -351,9 +375,7 @@
     }
 
     @media (max-width: 480px) {
-      .selected-inner {
-        flex-direction: row;
-      }
+      .selected-inner { flex-direction: row; }
     }
   </style>
 </head>
@@ -373,6 +395,14 @@
           <span class="status-dot"></span>
           <span>Activo</span>
         </div>
+      </div>
+
+      <!-- Selector de categoría -->
+      <div class="filter-row">
+        <label for="category-select">Categoría</label>
+        <select id="category-select">
+          <option value="all">Todas las categorías</option>
+        </select>
       </div>
 
       <div class="drum-row" id="drum-row">
@@ -419,10 +449,12 @@
     const IMAGE_BASE_PATH = "imagenes/";
     const STORY_URL_BASE = "https://www.disturbingstories.com/";
 
-    let stories = [];
+    let allStories = [];          // historias válidas (por ID y fecha)
+    let stories = [];             // historias filtradas por categoría
     let spinning = false;
     let intervalId = null;
     let currentIndex = -1;
+    let currentCategory = "all";
 
     const statusEl = document.getElementById("status");
     const drumRowEl = document.getElementById("drum-row");
@@ -431,6 +463,7 @@
     const previewSubtitleEl = document.getElementById("preview-subtitle");
     const startBtn = document.getElementById("start-button");
     const stopBtn = document.getElementById("stop-button");
+    const categorySelectEl = document.getElementById("category-select");
 
     const selectedBoxEl = document.getElementById("selected-story");
     const selectedImageEl = document.getElementById("selected-image");
@@ -450,8 +483,12 @@
 
         const data = await res.json();
 
-        // Solo IDs que sean exactamente 3 dígitos (XXX)
-        stories = Object
+        const todayStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+        // Mapear y filtrar:
+        // - IDs de exactamente 3 dígitos (XXX)
+        // - Fecha de publicación <= hoy (si existe)
+        const mapped = Object
           .entries(data)
           .filter(([id]) => /^\d{3}$/.test(id))
           .map(([id, item]) => ({
@@ -460,20 +497,24 @@
             synopsis: item.sinopsis || "",
             year: item.anio || "",
             categories: Array.isArray(item.categorias) ? item.categorias : [],
-            image: IMAGE_BASE_PATH + id + ".jpg",   // solo XXX.jpg
+            date: item.fecha || "",
+            image: IMAGE_BASE_PATH + id + ".jpg",
             url: STORY_URL_BASE + id + ".html"
-          }));
+          }))
+          .filter(story => !story.date || story.date <= todayStr);
 
-        if (stories.length === 0) {
-          throw new Error("No hay historias válidas con ID de 3 dígitos.");
+        allStories = mapped;
+
+        if (allStories.length === 0) {
+          throw new Error("No hay historias publicadas hasta hoy con ID de 3 dígitos.");
         }
 
-        currentIndex = 0;
-        updatePreview(stories[currentIndex]);
+        buildCategoryOptions(allStories);
+        applyCategoryFilter(); // esto ajusta 'stories' según la categoría actual
 
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        statusEl.textContent = "Historias cargadas: " + stories.length;
+        statusEl.textContent =
+          "Historias disponibles: " + stories.length +
+          " · Solo publicadas hasta hoy";
 
       } catch (e) {
         console.error("Error cargando historias:", e);
@@ -483,6 +524,64 @@
         previewTitleEl.textContent = "No se han podido cargar las historias.";
         previewSubtitleEl.textContent = "Revisa la ruta y el formato de admin/metadata.json.";
       }
+    }
+
+    function buildCategoryOptions(sourceStories) {
+      const cats = new Set();
+      sourceStories.forEach(story => {
+        story.categories.forEach(cat => cats.add(cat));
+      });
+
+      // Limpiamos todo excepto la primera opción ("Todas")
+      while (categorySelectEl.options.length > 1) {
+        categorySelectEl.remove(1);
+      }
+
+      Array.from(cats).sort().forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelectEl.appendChild(opt);
+      });
+    }
+
+    function applyCategoryFilter() {
+      // detener ruleta si está girando
+      if (spinning) {
+        stopSpinning();
+      }
+
+      if (currentCategory === "all") {
+        stories = allStories.slice();
+      } else {
+        stories = allStories.filter(story =>
+          story.categories.includes(currentCategory)
+        );
+      }
+
+      if (stories.length === 0) {
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        previewTitleEl.textContent = "No hay historias para esta categoría.";
+        previewSubtitleEl.textContent = "Prueba a cambiar el filtro.";
+        previewImgEl.src = "";
+        selectedBoxEl.classList.add("hidden");
+        statusEl.textContent =
+          "0 historias para la categoría seleccionada (solo publicadas hasta hoy)";
+        return;
+      }
+
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      currentIndex = 0;
+      updatePreview(stories[currentIndex]);
+
+      const filtroTexto =
+        currentCategory === "all" ? "todas las categorías" : currentCategory;
+      statusEl.textContent =
+        "Historias disponibles: " + stories.length +
+        " · Filtro: " + filtroTexto +
+        " · Solo publicadas hasta hoy";
     }
 
     function updatePreview(story) {
@@ -558,9 +657,16 @@
       selectedBoxEl.classList.remove("hidden");
     }
 
+    // Eventos
     startBtn.addEventListener("click", startSpinning);
     stopBtn.addEventListener("click", stopSpinning);
 
+    categorySelectEl.addEventListener("change", () => {
+      currentCategory = categorySelectEl.value;
+      applyCategoryFilter();
+    });
+
+    // Inicio
     loadStories();
   </script>
 </body>
