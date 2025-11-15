@@ -85,11 +85,6 @@
       text-transform: uppercase;
     }
 
-    .title-row .icon {
-      font-size: 18px;
-      filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.9));
-    }
-
     .widget-subtitle {
       font-size: 11px;
       color: var(--text-muted);
@@ -386,7 +381,7 @@
       <div class="widget-header">
         <div class="widget-title">
           <div class="title-row">
-            <span class="icon">🩸</span>
+            <!-- Sin icono de gota: solo texto -->
             <span>RANDOM STORY</span>
           </div>
           <div class="widget-subtitle">Ruleta de historias aleatorias</div>
@@ -482,7 +477,6 @@
         }
 
         const data = await res.json();
-
         const todayStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
         // Mapear y filtrar:
@@ -511,10 +505,6 @@
 
         buildCategoryOptions(allStories);
         applyCategoryFilter(); // esto ajusta 'stories' según la categoría actual
-
-        statusEl.textContent =
-          "Historias disponibles: " + stories.length +
-          " · Solo publicadas hasta hoy";
 
       } catch (e) {
         console.error("Error cargando historias:", e);
@@ -567,7 +557,7 @@
         previewImgEl.src = "";
         selectedBoxEl.classList.add("hidden");
         statusEl.textContent =
-          "0 historias para la categoría seleccionada (solo publicadas hasta hoy)";
+          "Historias disponibles: 0 · Solo publicadas hasta hoy";
         return;
       }
 
@@ -576,11 +566,8 @@
       currentIndex = 0;
       updatePreview(stories[currentIndex]);
 
-      const filtroTexto =
-        currentCategory === "all" ? "todas las categorías" : currentCategory;
       statusEl.textContent =
         "Historias disponibles: " + stories.length +
-        " · Filtro: " + filtroTexto +
         " · Solo publicadas hasta hoy";
     }
 
