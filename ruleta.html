@@ -7,20 +7,22 @@
 
   <style>
     :root {
-      --card-bg: rgba(15, 23, 42, 0.92);
-      --border: rgba(255, 255, 255, 0.15);
+      --bg: #05060a;
+      --card-bg: #111827;
+      --accent: #e11d48;
+      --accent-soft: rgba(225, 17, 72, 0.15);
       --text: #f9fafb;
       --text-muted: #9ca3af;
-      --accent-soft: rgba(225, 17, 72, 0.15);
+      --border: #1f2937;
       --radius-lg: 16px;
       --radius-xl: 22px;
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.7);
       --transition-fast: 0.18s ease-out;
     }
 
     * { box-sizing: border-box; }
 
-    /* Fondo transparente */
+    /* Fondo transparente para que "flote" en el embed */
     body {
       margin: 0;
       padding: 16px;
@@ -38,9 +40,8 @@
       width: 100%;
     }
 
-    /* Widget flotante */
     #story-widget {
-      background: var(--card-bg);
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(17, 24, 39, 0.98));
       border-radius: var(--radius-xl);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-soft);
@@ -49,12 +50,14 @@
       overflow: hidden;
     }
 
-    /* Quitar halo decorativo */
+    /* Quitamos halo decorativo extra (fondo transparente) */
     #story-widget::before {
       content: "";
       position: absolute;
       inset: 0;
       background: transparent !important;
+      pointer-events: none;
+      z-index: -1;
     }
 
     .widget-header {
@@ -72,6 +75,9 @@
     }
 
     .title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.05em;
@@ -104,6 +110,13 @@
       box-shadow: 0 0 8px rgba(74, 222, 128, 0.9);
     }
 
+    .status-line {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Filtro de categoría */
     .filter-row {
       margin-top: 6px;
       display: flex;
@@ -126,13 +139,16 @@
       background: rgba(15, 23, 42, 0.9);
       color: var(--text);
       font-size: 11px;
+      outline: none;
     }
+
+    /* --- Bombo / Ruleta --- */
 
     .drum-row {
       margin-top: 10px;
       padding: 10px;
       border-radius: var(--radius-lg);
-      background: rgba(2, 6, 23, 0.75);
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #030712 100%);
       border: 1px solid rgba(148, 163, 184, 0.25);
       display: flex;
       align-items: center;
@@ -146,6 +162,18 @@
       overflow: hidden;
       background: #020617;
       border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
+      position: relative;
+    }
+
+    .drum-image-wrapper::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      box-shadow:
+        inset 0 0 18px rgba(0, 0, 0, 0.85),
+        inset 0 0 2px rgba(148, 163, 184, 0.4);
+      pointer-events: none;
     }
 
     #preview-image {
@@ -153,10 +181,22 @@
       height: auto;
       display: block;
       object-fit: cover;
+      transform-origin: center;
+      transition: transform 100ms linear;
+    }
+
+    .drum-row.spinning #preview-image {
+      animation: pulseZoom 0.35s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseZoom {
+      from { transform: scale(1.03); }
+      to   { transform: scale(1.08); }
     }
 
     .drum-info {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -171,6 +211,8 @@
       font-size: 11px;
       color: var(--text-muted);
     }
+
+    /* --- Controles --- */
 
     .controls-row {
       margin-top: 10px;
@@ -187,32 +229,51 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       cursor: pointer;
-      transition: var(--transition-fast);
+      transition:
+        background var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        opacity var(--transition-fast),
+        filter var(--transition-fast);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+      box-shadow: none;
+      filter: grayscale(0.3);
     }
 
     .btn-primary {
-      background: #e11d48;
-      color: white;
+      background: radial-gradient(circle at 0 0, #f97316 0, #e11d48 45%, #7f1d1d 100%);
+      color: #f9fafb;
+      box-shadow: 0 10px 25px rgba(220, 38, 38, 0.6);
     }
 
     .btn-secondary {
-      background: #0f172a;
-      color: white;
-      border: 1px solid rgba(148,163,184,0.6);
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.9);
     }
 
-    .status-line {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 6px;
+    .btn:not(:disabled):active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.8);
     }
+
+    /* --- Historia seleccionada --- */
 
     .selected-story {
       margin-top: 14px;
-      padding: 10px;
+      padding: 10px 10px;
       border-radius: var(--radius-lg);
-      background: rgba(15, 23, 42, 0.9);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 64, 175, 0.45));
       border: 1px solid rgba(148, 163, 184, 0.4);
     }
 
@@ -222,20 +283,32 @@
 
     .selected-inner {
       display: flex;
+      align-items: flex-start;
       gap: 10px;
     }
 
     #selected-image {
+      flex: 0 0 30%;
       max-width: 110px;
       border-radius: 12px;
       object-fit: cover;
+      display: block;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75);
       background: #020617;
+    }
+
+    .selected-content {
+      flex: 1;
+      min-width: 0;
     }
 
     .label {
       font-size: 10px;
       text-transform: uppercase;
+      letter-spacing: 0.12em;
       color: var(--text-muted);
+      margin-bottom: 2px;
     }
 
     #selected-title {
@@ -243,27 +316,59 @@
       margin: 0 0 4px;
     }
 
-    #selected-summary {
+    #selected-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .meta-pill {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+    }
+
+    .meta-tag {
+      background: var(--accent-soft);
+      border-color: transparent;
+      color: #fecaca;
+    }
+
+    #selected-synopsis {
       font-size: 12px;
-      margin-bottom: 8px;
+      line-height: 1.4;
+      margin: 0 0 8px;
+      color: #e5e7eb;
     }
 
     #read-link {
+      font-size: 13px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 10px 16px;
-      background: rgba(148, 163, 184, 0.3);
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(248, 250, 252, 0.4);
       text-decoration: none;
-      color: white;
-      font-size: 13px;
-      transition: var(--transition-fast);
+      color: #f9fafb;
+      background: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.6), rgba(15, 23, 42, 0.95));
+      transition:
+        background var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+      white-space: nowrap;
     }
 
     #read-link:hover {
-      background: rgba(148, 163, 184, 0.5);
+      transform: translateY(-0.5px) scale(1.02);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.9);
+    }
+
+    @media (max-width: 480px) {
+      .selected-inner { flex-direction: row; }
     }
   </style>
 </head>
@@ -271,10 +376,11 @@
 <body>
   <div class="app">
     <div id="story-widget">
-
       <div class="widget-header">
         <div class="widget-title">
-          <div class="title-row">RANDOM STORY</div>
+          <div class="title-row">
+            <span>RANDOM STORY</span>
+          </div>
           <div class="widget-subtitle">Ruleta de historias aleatorias</div>
         </div>
         <div class="status-pill">
@@ -283,6 +389,7 @@
         </div>
       </div>
 
+      <!-- Selector de categoría -->
       <div class="filter-row">
         <label for="category-select">Categoría</label>
         <select id="category-select">
@@ -292,7 +399,7 @@
 
       <div class="drum-row" id="drum-row">
         <div class="drum-image-wrapper">
-          <img id="preview-image" src="" alt="">
+          <img id="preview-image" src="" alt="Historia aleatoria" />
         </div>
         <div class="drum-info">
           <div id="preview-title">Pulsa «Girar» para empezar.</div>
@@ -301,165 +408,243 @@
       </div>
 
       <div class="controls-row">
-        <button id="start-button" class="btn btn-primary" disabled>🎲 Girar</button>
-        <button id="stop-button" class="btn btn-secondary" disabled>✋ Detener</button>
+        <button id="start-button" class="btn btn-primary" disabled>
+          🎲 Girar
+        </button>
+        <button id="stop-button" class="btn btn-secondary" disabled>
+          ✋ Detener
+        </button>
       </div>
 
       <div id="status" class="status-line"></div>
 
       <div id="selected-story" class="selected-story hidden">
         <div class="selected-inner">
-          <img id="selected-image" src="" alt="">
-          <div>
+          <img id="selected-image" src="" alt="Historia seleccionada" />
+          <div class="selected-content">
             <div class="label">Historia seleccionada</div>
             <h3 id="selected-title"></h3>
-            <p id="selected-summary"></p>
-            <a id="read-link" href="#" target="_blank">📖 Leer historia completa</a>
+            <div id="selected-meta"></div>
+            <p id="selected-synopsis"></p>
+            <a id="read-link" href="#" target="_blank" rel="noopener noreferrer">
+              <span>📖</span>
+              <span>Leer historia completa</span>
+            </a>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-<script>
-const STORIES_URL = "admin/metadata.json";
-const IMAGE_BASE_PATH = "imagenes/";
-const STORY_URL_BASE = "https://www.disturbingstories.com/";
+  <script>
+    const STORIES_URL = "admin/metadata.json";
+    const IMAGE_BASE_PATH = "imagenes/";
+    const STORY_URL_BASE = "https://www.disturbingstories.com/";
 
-let allStories = [];
-let stories = [];
-let spinning = false;
-let intervalId = null;
-let currentIndex = 0;
-let currentCategory = "all";
+    let allStories = [];          // historias válidas (por ID y fecha)
+    let stories = [];             // historias filtradas por categoría
+    let spinning = false;
+    let intervalId = null;
+    let currentIndex = -1;
+    let currentCategory = "all";
 
-const statusEl = document.getElementById("status");
-const previewImgEl = document.getElementById("preview-image");
-const previewTitleEl = document.getElementById("preview-title");
-const previewSubtitleEl = document.getElementById("preview-subtitle");
-const startBtn = document.getElementById("start-button");
-const stopBtn = document.getElementById("stop-button");
-const categorySelectEl = document.getElementById("category-select");
+    const statusEl = document.getElementById("status");
+    const drumRowEl = document.getElementById("drum-row");
+    const previewImgEl = document.getElementById("preview-image");
+    const previewTitleEl = document.getElementById("preview-title");
+    const previewSubtitleEl = document.getElementById("preview-subtitle");
+    const startBtn = document.getElementById("start-button");
+    const stopBtn = document.getElementById("stop-button");
+    const categorySelectEl = document.getElementById("category-select");
 
-const selectedBoxEl = document.getElementById("selected-story");
-const selectedImageEl = document.getElementById("selected-image");
-const selectedTitleEl = document.getElementById("selected-title");
-const selectedSummaryEl = document.getElementById("selected-summary");
-const readLinkEl = document.getElementById("read-link");
+    const selectedBoxEl = document.getElementById("selected-story");
+    const selectedImageEl = document.getElementById("selected-image");
+    const selectedTitleEl = document.getElementById("selected-title");
+    const selectedMetaEl = document.getElementById("selected-meta");
+    const selectedSynopsisEl = document.getElementById("selected-synopsis");
+    const readLinkEl = document.getElementById("read-link");
 
-async function loadStories() {
-  try {
-    const res = await fetch(STORIES_URL);
-    if (!res.ok) throw new Error("No se encontró metadata.json");
+    async function loadStories() {
+      try {
+        statusEl.textContent = "Cargando historias…";
 
-    const data = await res.json();
-    const todayStr = new Date().toISOString().slice(0, 10);
+        const res = await fetch(STORIES_URL);
+        if (!res.ok) {
+          throw new Error("No se ha encontrado admin/metadata.json (" + res.status + ")");
+        }
 
-    allStories = Object.entries(data)
-      .filter(([id]) => /^\d{3}$/.test(id))
-      .map(([id, item]) => ({
-        id,
-        title: item.titulo,
-        synopsis: item.sinopsis,
-        categories: item.categorias || [],
-        date: item.fecha,
-        image: IMAGE_BASE_PATH + id + ".jpg",
-        url: STORY_URL_BASE + id + ".html"
-      }))
-      .filter(s => !s.date || s.date <= todayStr);
+        const data = await res.json();
+        const todayStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-    buildCategoryOptions();
-    applyCategoryFilter();
-  } catch {
-    statusEl.textContent = "Error al cargar historias";
-  }
-}
+        const mapped = Object
+          .entries(data)
+          .filter(([id]) => /^\d{3}$/.test(id))
+          .map(([id, item]) => ({
+            id,
+            title: item.titulo || "Historia sin título",
+            synopsis: item.sinopsis || "",
+            year: item.anio || "",
+            categories: Array.isArray(item.categorias) ? item.categorias : [],
+            date: item.fecha || "",
+            image: IMAGE_BASE_PATH + id + ".jpg",
+            url: STORY_URL_BASE + id + ".html"
+          }))
+          .filter(story => !story.date || story.date <= todayStr);
 
-function buildCategoryOptions() {
-  const cats = new Set();
-  allStories.forEach(s => s.categories.forEach(c => cats.add(c)));
+        allStories = mapped;
 
-  cats.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    categorySelectEl.appendChild(opt);
-  });
-}
+        if (allStories.length === 0) {
+          throw new Error("No hay historias publicadas hasta hoy con ID de 3 dígitos.");
+        }
 
-function applyCategoryFilter() {
-  stories = currentCategory === "all"
-    ? allStories.slice()
-    : allStories.filter(s => s.categories.includes(currentCategory));
+        buildCategoryOptions(allStories);
+        applyCategoryFilter(); // esto ajusta 'stories' según la categoría actual
 
-  if (stories.length === 0) {
-    startBtn.disabled = true;
-    stopBtn.disabled = true;
-    previewTitleEl.textContent = "Sin historias para esta categoría.";
-    statusEl.textContent = "Historias disponibles: 0 · Solo publicadas hasta hoy";
-    return;
-  }
+      } catch (e) {
+        console.error("Error cargando historias:", e);
+        statusEl.textContent = "ERROR: " + e.message;
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        previewTitleEl.textContent = "No se han podido cargar las historias.";
+        previewSubtitleEl.textContent = "Revisa la ruta y el formato de admin/metadata.json.";
+      }
+    }
 
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
+    function buildCategoryOptions(sourceStories) {
+      const cats = new Set();
+      sourceStories.forEach(story => {
+        story.categories.forEach(cat => cats.add(cat));
+      });
 
-  statusEl.textContent =
-    "Historias disponibles: " + stories.length + " · Solo publicadas hasta hoy";
+      while (categorySelectEl.options.length > 1) {
+        categorySelectEl.remove(1);
+      }
 
-  currentIndex = 0;
-  updatePreview(stories[0]);
-}
+      Array.from(cats).sort().forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelectEl.appendChild(opt);
+      });
+    }
 
-function updatePreview(story) {
-  previewImgEl.src = story.image;
-  previewTitleEl.textContent = story.title + " (ID: " + story.id + ")";
-}
+    function applyCategoryFilter() {
+      if (spinning) {
+        stopSpinning();
+      }
 
-function getRandomIndex() {
-  return Math.floor(Math.random() * stories.length);
-}
+      if (currentCategory === "all") {
+        stories = allStories.slice();
+      } else {
+        stories = allStories.filter(story =>
+          story.categories.includes(currentCategory)
+        );
+      }
 
-function startSpinning() {
-  spinning = true;
-  startBtn.disabled = true;
-  stopBtn.disabled = false;
+      if (stories.length === 0) {
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        previewTitleEl.textContent = "No hay historias para esta categoría.";
+        previewSubtitleEl.textContent = "Prueba a cambiar el filtro.";
+        previewImgEl.src = "";
+        selectedBoxEl.classList.add("hidden");
+        statusEl.textContent =
+          "Historias disponibles: 0 · Solo publicadas hasta hoy";
+        return;
+      }
 
-  selectedBoxEl.classList.add("hidden");
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      currentIndex = 0;
+      updatePreview(stories[currentIndex]);
 
-  intervalId = setInterval(() => {
-    currentIndex = getRandomIndex();
-    updatePreview(stories[currentIndex]);
-  }, 80);
-}
+      statusEl.textContent =
+        "Historias disponibles: " + stories.length +
+        " · Solo publicadas hasta hoy";
+    }
 
-function stopSpinning() {
-  spinning = false;
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
-  clearInterval(intervalId);
+    function updatePreview(story) {
+      previewImgEl.src = story.image;
+      previewImgEl.alt = story.title;
+      previewTitleEl.textContent = story.title + " (ID: " + story.id + ")";
+    }
 
-  const story = stories[currentIndex];
-  updatePreview(story);
+    function getRandomIndex() {
+      if (stories.length === 1) return 0;
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * stories.length);
+      } while (idx === currentIndex);
+      currentIndex = idx;
+      return idx;
+    }
 
-  selectedImageEl.src = story.image;
-  selectedTitleEl.textContent = story.title;
-  selectedSummaryEl.textContent = story.synopsis;
-  readLinkEl.href = story.url;
+    function startSpinning() {
+      if (spinning || stories.length === 0) return;
+      spinning = true;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      selectedBoxEl.classList.add("hidden");
+      previewSubtitleEl.textContent = "La ruleta está girando…";
+      drumRowEl.classList.add("spinning");
 
-  selectedBoxEl.classList.remove("hidden");
-}
+      intervalId = setInterval(() => {
+        const idx = getRandomIndex();
+        updatePreview(stories[idx]);
+      }, 80);
+    }
 
-startBtn.addEventListener("click", startSpinning);
-stopBtn.addEventListener("click", stopSpinning);
+    function stopSpinning() {
+      if (!spinning) return;
+      spinning = false;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      previewSubtitleEl.textContent = "Esta es la historia que ha tocado.";
+      drumRowEl.classList.remove("spinning");
 
-categorySelectEl.addEventListener("change", () => {
-  currentCategory = categorySelectEl.value;
-  applyCategoryFilter();
-});
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
 
-loadStories();
-</script>
+      const story = stories[currentIndex];
+      updatePreview(story);
+      showSelectedStory(story);
+    }
 
+    function showSelectedStory(story) {
+      selectedImageEl.src = story.image;
+      selectedImageEl.alt = story.title;
+      selectedTitleEl.textContent = story.title;
+
+      const metaParts = [];
+
+      if (story.year) {
+        metaParts.push('<span class="meta-pill">' + story.year + '</span>');
+      }
+
+      if (story.categories && story.categories.length > 0) {
+        story.categories.forEach(cat => {
+          metaParts.push('<span class="meta-pill meta-tag">' + cat + '</span>');
+        });
+      }
+
+      selectedMetaEl.innerHTML = metaParts.join("");
+      selectedSynopsisEl.textContent = story.synopsis;
+      readLinkEl.href = story.url;
+
+      selectedBoxEl.classList.remove("hidden");
+    }
+
+    startBtn.addEventListener("click", startSpinning);
+    stopBtn.addEventListener("click", stopSpinning);
+
+    categorySelectEl.addEventListener("change", () => {
+      currentCategory = categorySelectEl.value;
+      applyCategoryFilter();
+    });
+
+    loadStories();
+  </script>
 </body>
 </html>
