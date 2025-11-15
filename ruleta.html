@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Ruleta de Historias - Disturbing Stories</title>
+  <title>Ruleta de Historias - Random Story</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -138,8 +138,8 @@
     }
 
     .drum-image-wrapper {
-      flex: 0 0 30%;        /* aprox. una cuarta parte del ancho */
-      max-width: 120px;     /* tamaño máximo de la imagen */
+      flex: 0 0 30%;
+      max-width: 120px;
       border-radius: 14px;
       overflow: hidden;
       background: #020617;
@@ -271,7 +271,7 @@
 
     #selected-image {
       flex: 0 0 30%;
-      max-width: 110px;     /* imagen pequeña, ~1/4 del contenedor */
+      max-width: 110px;
       border-radius: 12px;
       object-fit: cover;
       display: block;
@@ -322,16 +322,17 @@
     #selected-synopsis {
       font-size: 12px;
       line-height: 1.4;
-      margin: 0 0 6px;
+      margin: 0 0 8px;
       color: #e5e7eb;
     }
 
+    /* Botón de leer historia más grande */
     #read-link {
-      font-size: 11px;
+      font-size: 13px;              /* más grande */
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 5px 9px;
+      gap: 8px;
+      padding: 10px 16px;           /* doble padding ≈ doble tamaño visual */
       border-radius: 999px;
       border: 1px solid rgba(248, 250, 252, 0.4);
       text-decoration: none;
@@ -341,10 +342,11 @@
         background var(--transition-fast),
         transform var(--transition-fast),
         box-shadow var(--transition-fast);
+      white-space: nowrap;
     }
 
     #read-link:hover {
-      transform: translateY(-0.5px);
+      transform: translateY(-0.5px) scale(1.02);
       box-shadow: 0 6px 16px rgba(15, 23, 42, 0.9);
     }
 
@@ -363,7 +365,7 @@
         <div class="widget-title">
           <div class="title-row">
             <span class="icon">🩸</span>
-            <span>Disturbing Stories</span>
+            <span>RANDOM STORY</span>
           </div>
           <div class="widget-subtitle">Ruleta de historias aleatorias</div>
         </div>
@@ -413,7 +415,6 @@
   </div>
 
   <script>
-    // Rutas (válidas en GitHub Pages y en local con servidor http)
     const STORIES_URL = "admin/metadata.json";
     const IMAGE_BASE_PATH = "imagenes/";
     const STORY_URL_BASE = "https://www.disturbingstories.com/";
@@ -449,18 +450,22 @@
 
         const data = await res.json();
 
-        stories = Object.entries(data).map(([id, item]) => ({
-          id,
-          title: item.titulo || "Historia sin título",
-          synopsis: item.sinopsis || "",
-          year: item.anio || "",
-          categories: Array.isArray(item.categorias) ? item.categorias : [],
-          image: IMAGE_BASE_PATH + id + ".jpg",
-          url: STORY_URL_BASE + id + ".html"
-        }));
+        // Solo IDs que sean exactamente 3 dígitos (XXX)
+        stories = Object
+          .entries(data)
+          .filter(([id]) => /^\d{3}$/.test(id))
+          .map(([id, item]) => ({
+            id,
+            title: item.titulo || "Historia sin título",
+            synopsis: item.sinopsis || "",
+            year: item.anio || "",
+            categories: Array.isArray(item.categorias) ? item.categorias : [],
+            image: IMAGE_BASE_PATH + id + ".jpg",   // solo XXX.jpg
+            url: STORY_URL_BASE + id + ".html"
+          }));
 
         if (stories.length === 0) {
-          throw new Error("metadata.json está vacío.");
+          throw new Error("No hay historias válidas con ID de 3 dígitos.");
         }
 
         currentIndex = 0;
@@ -503,7 +508,6 @@
       stopBtn.disabled = false;
       selectedBoxEl.classList.add("hidden");
       previewSubtitleEl.textContent = "La ruleta está girando…";
-
       drumRowEl.classList.add("spinning");
 
       intervalId = setInterval(() => {
