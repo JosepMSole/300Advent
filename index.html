@@ -7,6 +7,7 @@
   <title>Mural 300 Interactivo</title>
   <link rel="stylesheet" href="CSS/STYLESS.css" />
   <link rel="icon" href="icon/ico.ico" type="image/x-icon" />
+
   <style>
     /* Fondo transparente */
     body {
@@ -16,7 +17,7 @@
 </head>
 <body>
 
-  <!-- Video de fondo REMOVIDO para tener fondo transparente -->
+  <!-- Video de fondo REMOVIDO para mantener transparencia -->
 
   <!-- Logo principal -->
   <img src="imagenes/300STORIES.png" alt="Logo 300 Stories" id="logoPrincipal" />
@@ -29,7 +30,7 @@
   <select id="ordenarPor" style="margin-bottom: 15px; padding: 6px; font-size: 1rem;">
     <option value="" selected disabled>ORDENAR POR</option>
     <option value="numero">Número de Colección</option>
-    <option value="anio">Año de la Story</option>
+    <option value="anio">Año</option>
     <option value="fecha">Fecha Publicación</option>
     <option value="titulo">Título</option>
     <option value="Terror">Terror</option>
@@ -57,7 +58,7 @@
     <span class="close" id="closeModal">&times;</span>
     <div class="modal-wrapper">
       <img class="modal-content" id="modalImage" />
-      <a id="modalLink" href="#" class="modal-link" target="_parent">ACCEDER</a>
+      <a id="modalLink" href="#" class="modal-link" target="_top">ACCEDER</a>
     </div>
   </div>
 
@@ -65,16 +66,25 @@
   <script src="JS/main.js"></script>
 
   <script>
-    /* Eliminado script de volverStories */
-
+    /* Botón volver arriba */
     document.getElementById('volverArriba').addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    /* Forzar que todos los enlaces clicables apunten a parent */
+    /* Forzar que todos los enlaces abran fuera del iframe */
     document.addEventListener("DOMContentLoaded", () => {
+
+      // Todos los <a> pasan a target=_top
       document.querySelectorAll('a').forEach(a => {
-        a.setAttribute("target", "_parent");
+        a.setAttribute("target", "_top");
+
+        // Si el link tiene href real, forzar salida del iframe
+        a.addEventListener("click", (e) => {
+          if (a.href && a.href !== "#") {
+            e.preventDefault();
+            window.top.location.href = a.href;
+          }
+        });
       });
     });
   </script>
