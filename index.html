@@ -7,14 +7,16 @@
   <title>Mural 300 Interactivo</title>
   <link rel="stylesheet" href="CSS/STYLESS.css" />
   <link rel="icon" href="icon/ico.ico" type="image/x-icon" />
+  <style>
+    /* Fondo transparente */
+    body {
+      background: transparent !important;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Video de fondo -->
-  <video autoplay muted loop playsinline id="bg-video">
-    <source src="videos/300ADVENT - BG 1.mp4" type="video/mp4" />
-    Tu navegador no soporta videos HTML5.
-  </video>
+  <!-- Video de fondo REMOVIDO para tener fondo transparente -->
 
   <!-- Logo principal -->
   <img src="imagenes/300STORIES.png" alt="Logo 300 Stories" id="logoPrincipal" />
@@ -27,7 +29,7 @@
   <select id="ordenarPor" style="margin-bottom: 15px; padding: 6px; font-size: 1rem;">
     <option value="" selected disabled>ORDENAR POR</option>
     <option value="numero">Número de Colección</option>
-    <option value="anio">Año</option>
+    <option value="anio">Año de la Story</option>
     <option value="fecha">Fecha Publicación</option>
     <option value="titulo">Título</option>
     <option value="Terror">Terror</option>
@@ -43,10 +45,7 @@
 
   <div class="gallery" id="gallery"></div>
 
-  <!-- Botón "Volver a las Stories" debajo del mural -->
-  <div class="volver-container">
-    <button id="volverStories" type="button">Volver a las Stories</button>
-  </div>
+  <!-- Botón "Volver a las Stories" ELIMINADO -->
 
   <!-- Botón "Volver arriba" -->
   <div class="volver-container">
@@ -58,7 +57,7 @@
     <span class="close" id="closeModal">&times;</span>
     <div class="modal-wrapper">
       <img class="modal-content" id="modalImage" />
-      <a id="modalLink" href="#" class="modal-link">ACCEDER</a>
+      <a id="modalLink" href="#" class="modal-link" target="_parent">ACCEDER</a>
     </div>
   </div>
 
@@ -66,12 +65,17 @@
   <script src="JS/main.js"></script>
 
   <script>
-    document.getElementById('volverStories').addEventListener('click', () => {
-      window.location.href = 'https://www.disturbingstories.com/stories.html';
-    });
+    /* Eliminado script de volverStories */
 
     document.getElementById('volverArriba').addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* Forzar que todos los enlaces clicables apunten a parent */
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('a').forEach(a => {
+        a.setAttribute("target", "_parent");
+      });
     });
   </script>
 
