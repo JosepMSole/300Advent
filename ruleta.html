@@ -1,279 +1,883 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>Random Story – Ruleta v3</title>
+  <meta charset="UTF-8" />
+  <title>Ruleta de Stories - RANDOM STORY</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<style>
-/* =======================
-   RESET / BASE
-======================= */
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: transparent;
-  font-family: 'Orbitron', Arial, sans-serif;
-  color: #e6f1ff;
-}
+  <style>
+    :root{
+      --bg: transparent;
+      --panel: rgba(6, 9, 14, .86);
+      --panel2: rgba(12, 18, 28, .92);
+      --text: #f8fafc;
+      --muted: rgba(248,250,252,.70);
+      --border: rgba(148, 163, 184, .28);
+      --shadow: 0 22px 60px rgba(0,0,0,.78);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
 
-/* =======================
-   CONTENEDOR PRINCIPAL
-======================= */
-#story-widget {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  margin: auto;
-  padding: 30px;
-  overflow: hidden;
-}
+      --accentA: #ff4d2e;
+      --accentB: #e11d48;
+      --accentC: #7c3aed;
+      --glow: 0 0 14px rgba(255,77,46,.35), 0 0 38px rgba(225,29,72,.22);
+    }
 
-/* SKIN */
-#story-widget::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("imagenes/assets/skinruleta.png") center / cover no-repeat;
-  z-index: -2;
-}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
 
-/* GLITCH NOISE */
-#story-widget::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.03) 0,
-      rgba(255,255,255,0.03) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-  mix-blend-mode: overlay;
-  opacity: .4;
-  pointer-events: none;
-  animation: scan 4s linear infinite;
-}
+    body{
+      margin:0;
+      padding:16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent !important;
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
 
-@keyframes scan {
-  from { background-position-y: 0; }
-  to   { background-position-y: 100px; }
-}
+    .app{ max-width: 460px; width:100%; }
 
-/* =======================
-   TITULO
-======================= */
-.title {
-  position: relative;
-  text-align: center;
-  font-size: clamp(42px, 7vw, 90px);
-  letter-spacing: 4px;
-  margin-bottom: 5px;
-  animation: titleFloat 2s infinite alternate ease-in-out;
-}
+    /* ====== PANEL / SKIN ====== */
+    #story-widget{
+      position:relative;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, .18);
+      box-shadow: var(--shadow);
+      /* v2.1: quitamos el bloque oscuro para no tapar el skin */
+      background: transparent;
+      padding: 16px 16px 14px;
+      overflow:hidden;
+      isolation:isolate; /* para blend modes */
+    }
 
-.title::before,
-.title::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  width: 100%;
-  opacity: .8;
-}
+    /* Skin base (tu PNG) */
+    #story-widget::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background-image: url("imagenes/assets/skinruleta.png");
+      background-size: cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      opacity: .75;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+      z-index:0;
+      filter: contrast(1.05) saturate(1.05);
+    }
 
-.title::before {
-  top: -2px;
-  color: #ff004c;
-  clip-path: inset(0 0 60% 0);
-  animation: glitch1 1.2s infinite linear alternate;
-}
+    /* Scanlines */
+    #story-widget::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.03) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 6px
+        );
+      opacity:.14;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+      z-index:1;
+      animation: scanShift 5.5s linear infinite;
+    }
+    @keyframes scanShift{
+      from{ transform: translateY(0); }
+      to{ transform: translateY(40px); }
+    }
 
-.title::after {
-  top: 2px;
-  color: #00ffe7;
-  clip-path: inset(40% 0 0 0);
-  animation: glitch2 1s infinite linear alternate;
-}
+    /* Noise overlay */
+    .noise{
+      position:absolute;
+      inset:-20%;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+      opacity:.10;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+      z-index:2;
+      animation: noiseMove 1.2s steps(2) infinite;
+    }
+    @keyframes noiseMove{
+      0%{ transform: translate3d(0,0,0); }
+      25%{ transform: translate3d(-2%,1%,0); }
+      50%{ transform: translate3d(1%,-2%,0); }
+      75%{ transform: translate3d(2%,2%,0); }
+      100%{ transform: translate3d(0,0,0); }
+    }
 
-@keyframes titleFloat {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-8px); }
-}
+    /* Content layers above overlays */
+    .layer{ position:relative; z-index:3; }
 
-@keyframes glitch1 {
-  from { transform: translateX(-2px); }
-  to   { transform: translateX(3px); }
-}
+    /* ====== HEADER ====== */
+    .widget-header{ margin-bottom:10px; }
 
-@keyframes glitch2 {
-  from { transform: translateX(2px); }
-  to   { transform: translateX(-3px); }
-}
+    .widget-title{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      gap:6px;
+    }
 
-.subtitle {
-  text-align: center;
-  font-size: 18px;
-  opacity: .85;
-  margin-bottom: 25px;
-}
+    .title-row{
+      width:100%;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+      line-height: 1;
+      font-size: 28px; /* grande */
+      position:relative;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,.75));
+      /* v2.1: movimiento más evidente */
+      animation: titleRumble 1.05s steps(2) infinite;
+    }
 
-/* =======================
-   RULETA
-======================= */
-#roulette {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
+    @keyframes titleRumble{
+      0%{ transform: translate(0,0) skew(0deg); }
+      10%{ transform: translate(-1px, 0) skew(-.5deg); }
+      20%{ transform: translate(2px, -1px) skew(.6deg); }
+      30%{ transform: translate(-2px, 1px) skew(-.8deg); }
+      40%{ transform: translate(1px, 0) skew(.4deg); }
+      50%{ transform: translate(0, -1px) skew(-.3deg); }
+      60%{ transform: translate(2px, 1px) skew(.8deg); }
+      70%{ transform: translate(-1px, 0) skew(-.6deg); }
+      80%{ transform: translate(1px, -1px) skew(.5deg); }
+      90%{ transform: translate(-2px, 1px) skew(-.7deg); }
+      100%{ transform: translate(0,0) skew(0deg); }
+    }
 
-.thumb {
-  width: 120px;
-  aspect-ratio: 9 / 16;
-  background-size: cover;
-  background-position: center;
-  border: 1px solid rgba(0,255,255,.4);
-  box-shadow: 0 0 10px rgba(0,255,255,.3);
-}
+    /* Glitch sutil en el título */
+    .title-row .glitch{
+      position:relative;
+      display:block;
+      width:100%;
+    }
+    .title-row .glitch::before,
+    .title-row .glitch::after{
+      content: attr(data-text);
+      position:absolute;
+      left:0;
+      top:0;
+      width:100%;
+      overflow:hidden;
+      opacity:.55;
+      mix-blend-mode: screen;
+      pointer-events:none;
+    }
+    .title-row .glitch::before{
+      transform: translateX(-1px);
+      color: rgba(124,58,237,.85);
+      animation: glitchA 1.4s infinite;
+    }
+    .title-row .glitch::after{
+      transform: translateX(1px);
+      color: rgba(225,29,72,.85);
+      animation: glitchB 1.2s infinite;
+    }
+    @keyframes glitchA{
+      0%, 8%, 100%{ clip-path: inset(0 0 0 0); transform: translate(-1px,0); }
+      10%{ clip-path: inset(10% 0 70% 0); transform: translate(-5px,-1px); }
+      14%{ clip-path: inset(60% 0 18% 0); transform: translate(6px,1px); }
+      18%{ clip-path: inset(28% 0 44% 0); transform: translate(-4px,0); }
+      36%{ clip-path: inset(48% 0 28% 0); transform: translate(5px,-1px); }
+      58%{ clip-path: inset(8% 0 74% 0); transform: translate(-6px,1px); }
+      82%{ clip-path: inset(72% 0 10% 0); transform: translate(4px,0); }
+    }
+    @keyframes glitchB{
+      0%, 6%, 100%{ clip-path: inset(0 0 0 0); transform: translate(1px,0); }
+      12%{ clip-path: inset(52% 0 22% 0); transform: translate(7px,0); }
+      16%{ clip-path: inset(18% 0 62% 0); transform: translate(-7px,1px); }
+      22%{ clip-path: inset(72% 0 10% 0); transform: translate(5px,-1px); }
+      44%{ clip-path: inset(22% 0 58% 0); transform: translate(-6px,0); }
+      66%{ clip-path: inset(62% 0 18% 0); transform: translate(6px,-1px); }
+      88%{ clip-path: inset(12% 0 74% 0); transform: translate(-5px,1px); }
+    }
 
-/* =======================
-   INFO
-======================= */
-#info {
-  text-align: center;
-  margin-bottom: 20px;
-}
+    .widget-subtitle{
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing:.06em;
+    }
 
-/* =======================
-   BOTON UNICO
-======================= */
-#spinBtn {
-  width: 100%;
-  padding: 18px;
-  font-size: 22px;
-  font-family: inherit;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  cursor: pointer;
-  color: #fff;
-  background: linear-gradient(120deg,#0ff,#005);
-  border: none;
-  position: relative;
-  overflow: hidden;
-}
+    /* ====== FILTER ====== */
+    .filter-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .filter-row label{
+      text-transform: uppercase;
+      letter-spacing:.14em;
+      white-space:nowrap;
+    }
+    .filter-row select{
+      flex:1;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, .55);
+      background: rgba(2,6,23,.55);
+      color: var(--text);
+      font-size: 12px;
+      outline:none;
+      backdrop-filter: blur(6px);
+    }
 
-#spinBtn::after {
-  content:"";
-  position:absolute;
-  inset:-50%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,.4), transparent);
-  animation: shine 2s infinite;
-}
+    /* ====== DRUM ====== */
+    .drum-row{
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, .22);
+      background: radial-gradient(circle at 20% 0, rgba(255,77,46,.12), rgba(2,6,23,.82) 50%, rgba(2,6,23,.92));
+      padding: 10px;
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      /* más alto para miniatura 9:16 */
+      min-height: 190px; /* fijo para que no “salte” */
+      position:relative;
+      overflow:hidden;
+    }
+    .drum-row::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(225,29,72,.16), transparent 55%),
+        radial-gradient(circle at 10% 90%, rgba(124,58,237,.14), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
 
-@keyframes shine {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
-}
+    .drum-image-wrapper{
+      flex: 0 0 26%;
+      max-width: 108px;
+      aspect-ratio: 9 / 16;
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid rgba(148, 163, 184, .22);
+      background: rgba(2,6,23,.9);
+      box-shadow: 0 14px 30px rgba(0,0,0,.70);
+      position:relative;
+    }
+    .drum-image-wrapper::after{
+      content:"";
+      position:absolute; inset:0;
+      box-shadow: inset 0 0 18px rgba(0,0,0,.82), inset 0 0 2px rgba(248,250,252,.28);
+      pointer-events:none;
+    }
 
-#spinBtn.spinning {
-  background: linear-gradient(120deg,#ff004c,#300);
-}
+    #preview-image{
+      width:100%;
+      height: 100%;
+      display:block;
+      object-fit: cover;
+      transition: transform 120ms linear;
+    }
 
-/* =======================
-   LEER HISTORIA
-======================= */
-#readStory {
-  margin-top: 15px;
-  text-align: center;
-  cursor: pointer;
-  animation: pulse 1.5s infinite;
-}
+    .drum-row.spinning #preview-image{
+      animation: pulseZoom .32s ease-in-out infinite alternate;
+    }
+    @keyframes pulseZoom{
+      from{ transform: scale(1.02) rotate(-.2deg); }
+      to{ transform: scale(1.08) rotate(.2deg); }
+    }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-  100% { transform: scale(1); }
-}
-</style>
+    .drum-info{
+      flex:1;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      position:relative;
+      z-index:1;
+    }
+    #preview-title{
+      font-size: 13px;
+      font-weight: 650;
+      text-shadow: 0 10px 18px rgba(0,0,0,.75);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    #preview-subtitle{
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ====== CONTROLS (no se mueven) ====== */
+    .controls-row{
+      margin-top: 10px;
+      display:flex;
+      position:relative;
+      z-index:4;
+    }
+
+    .btn{
+      flex:1;
+      border:0;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing:.08em;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition: transform .18s ease, filter .18s ease, opacity .18s ease;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+      backdrop-filter: blur(6px);
+    }
+    .btn:disabled{
+      opacity:.55;
+      cursor:default;
+      filter: grayscale(.35);
+      box-shadow:none;
+    }
+
+    .btn-wide{
+      width: 100%;
+      justify-content: center;
+    }
+    #spin-toggle-button{
+      gap: 10px;
+    }
+    #spin-toggle-button .stop-icon{ display:none; }
+    #spin-toggle-button.is-spinning .spin-icon{ display:none; }
+    #spin-toggle-button.is-spinning .stop-icon{ display:inline-block; }
+
+    .btn:not(:disabled):active{
+      transform: translateY(1px) scale(.985);
+    }
+
+    .btn-primary{
+      color: #0b1020;
+      background: radial-gradient(circle at 0 0, rgba(255,255,255,.9), rgba(255,255,255,.25) 32%, rgba(0,0,0,0) 55%),
+                  linear-gradient(135deg, rgba(255,77,46,.96), rgba(225,29,72,.92));
+      box-shadow: 0 14px 30px rgba(225,29,72,.42), var(--glow);
+    }
+    .btn-secondary{
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(2,6,23,.55), rgba(2,6,23,.92));
+      border: 1px solid rgba(148, 163, 184, .55);
+      box-shadow: 0 12px 26px rgba(0,0,0,.65);
+    }
+
+    /* Efecto continuo (brillo barrido) */
+    .btn::before{
+      content:"";
+      position:absolute;
+      inset:-40% -20%;
+      background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.35) 50%, rgba(255,255,255,0) 60%);
+      transform: translateX(-120%);
+      opacity:.55;
+      pointer-events:none;
+    }
+    .btn:not(:disabled)::before{
+      animation: sheen 2.1s linear infinite;
+    }
+    @keyframes sheen{
+      0%{ transform: translateX(-120%); }
+      100%{ transform: translateX(120%); }
+    }
+
+    /* Iconos animados en loop */
+    .icon{
+      width: 16px;
+      height: 16px;
+      display:inline-block;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.55));
+    }
+    .icon-dice{ animation: diceRoll 1.2s linear infinite; }
+    @keyframes diceRoll{
+      0%{ transform: rotate(0deg) translateZ(0); }
+      50%{ transform: rotate(180deg) translateZ(0); }
+      100%{ transform: rotate(360deg) translateZ(0); }
+    }
+    .icon-stop{ animation: stopPulse .9s ease-in-out infinite; transform-origin:center; }
+    @keyframes stopPulse{
+      0%,100%{ transform: scale(1); opacity: .95; }
+      50%{ transform: scale(1.15); opacity: 1; }
+    }
+
+    /* ====== STATUS ====== */
+    #status{
+      margin-top: 8px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      min-height: 14px;
+    }
+
+    /* ====== SELECTED STORY (reserva de espacio para que nada “salte”) ====== */
+    .selected-story{
+      margin-top: 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, .28);
+      background: linear-gradient(135deg, rgba(2,6,23,.70), rgba(124,58,237,.18));
+      padding: 10px;
+      min-height: 190px; /* reserva el hueco aunque esté oculto */
+      transition: opacity .22s ease, transform .22s ease, filter .22s ease;
+    }
+    .selected-story.hidden{
+      opacity:0;
+      transform: translateY(8px);
+      pointer-events:none;
+      filter: blur(2px);
+    }
+
+    .selected-inner{ display:flex; gap:10px; align-items:flex-start; }
+    #selected-image{
+      flex: 0 0 26%;
+      width: 96px;
+      height: calc(96px * 16 / 9);
+      aspect-ratio: 9 / 16;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(148, 163, 184, .22);
+      background: rgba(2,6,23,.9);
+      box-shadow: 0 14px 30px rgba(0,0,0,.70);
+    }
+    .selected-content{ flex:1; min-width:0; }
+    .label{
+      font-size:10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    #selected-title{
+      font-size: 14px;
+      margin: 0 0 6px;
+    }
+    #selected-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .meta-pill{
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, .55);
+      background: rgba(2,6,23,.35);
+    }
+    .meta-tag{
+      border-color: transparent;
+      background: linear-gradient(135deg, rgba(225,29,72,.16), rgba(124,58,237,.16));
+      color: rgba(255,255,255,.92);
+    }
+    #selected-synopsis{
+      font-size: 12px;
+      line-height: 1.42;
+      margin: 0 0 10px;
+      color: rgba(248,250,252,.92);
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow:hidden;
+    }
+
+    #read-link{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(248,250,252,.40);
+      text-decoration:none;
+      color: var(--text);
+      background: radial-gradient(circle at 0 0, rgba(255,77,46,.28), rgba(2,6,23,.88));
+      box-shadow: 0 14px 30px rgba(0,0,0,.55);
+      transition: transform .18s ease, filter .18s ease;
+      white-space: nowrap;
+    }
+    #read-link:hover{ transform: translateY(-1px) scale(1.02); filter: brightness(1.08); }
+
+    /* v2.1: animación del icono "LEER HISTORIA" */
+    #read-link .icon-read{
+      display:inline-block;
+      transform-origin: 50% 70%;
+      animation: bookWiggle 1.15s ease-in-out infinite;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.55));
+    }
+    @keyframes bookWiggle{
+      0%{ transform: translateY(0) rotate(0deg) scale(1); }
+      25%{ transform: translateY(-2px) rotate(-10deg) scale(1.02); }
+      50%{ transform: translateY(1px) rotate(8deg) scale(1.04); }
+      75%{ transform: translateY(-1px) rotate(-6deg) scale(1.02); }
+      100%{ transform: translateY(0) rotate(0deg) scale(1); }
+    }
+
+    /* Micro-glitch en el panel cuando gira */
+    .drum-row.spinning{
+      animation: panelJitter 2.2s steps(2) infinite;
+    }
+    @keyframes panelJitter{
+      0%, 86%, 100%{ transform: translate(0,0); }
+      88%{ transform: translate(-1px, 0); }
+      90%{ transform: translate(1px, -1px); }
+      92%{ transform: translate(0, 1px); }
+      94%{ transform: translate(1px, 0); }
+    }
+
+    @media (max-width: 480px){
+      .title-row{ font-size: 26px; }
+      #preview-title{ font-size: 12.5px; }
+      .selected-story{ min-height: 200px; }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="app">
+    <div id="story-widget">
+      <div class="noise" aria-hidden="true"></div>
 
-<div id="story-widget">
+      <div class="layer">
+        <div class="widget-header">
+          <div class="widget-title">
+            <div class="title-row">
+              <span class="glitch" data-text="RANDOM STORY">RANDOM STORY</span>
+            </div>
+            <div class="widget-subtitle">Ruleta de Stories aleatorias</div>
+          </div>
+        </div>
 
-  <div class="title" data-text="RANDOM STORY">RANDOM STORY</div>
-  <div class="subtitle">Ruleta de Stories aleatorias</div>
+        <!-- Selector de categoría -->
+        <div class="filter-row">
+          <label for="category-select">Categoría</label>
+          <select id="category-select">
+            <option value="all">Todas las categorías</option>
+          </select>
+        </div>
 
-  <div id="roulette">
-    <div class="thumb"></div>
-    <div class="thumb"></div>
-    <div class="thumb"></div>
+        <div class="drum-row" id="drum-row">
+          <div class="drum-image-wrapper">
+            <img id="preview-image" src="" alt="Historia aleatoria" />
+          </div>
+          <div class="drum-info">
+            <div id="preview-title">Cargando…</div>
+            <div id="preview-subtitle">Pulsa «Girar» para empezar.</div>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button id="spin-toggle-button" class="btn btn-primary btn-wide" disabled aria-live="polite">
+            <span class="icon icon-dice spin-icon" aria-hidden="true">🎲</span>
+            <span class="icon icon-stop stop-icon" aria-hidden="true">✋</span>
+            <span class="btn-label" id="spin-toggle-label">Girar</span>
+          </button>
+        </div>
+
+        <div id="status"></div>
+
+        <div id="selected-story" class="selected-story hidden" aria-live="polite">
+          <div class="selected-inner">
+            <img id="selected-image" src="" alt="Historia seleccionada" />
+            <div class="selected-content">
+              <div class="label">Historia seleccionada</div>
+              <h3 id="selected-title"></h3>
+              <div id="selected-meta"></div>
+              <p id="selected-synopsis"></p>
+              <a id="read-link" href="#" target="_parent" rel="noopener">
+                <span class="icon-read" aria-hidden="true">📖</span>
+                <span>Leer historia completa</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.layer -->
+    </div>
   </div>
 
-  <div id="info">Historias disponibles: 12</div>
+  <script>
+    const STORIES_URL = "admin/metadata.json";
+    const IMAGE_BASE_PATH = "imagenes/";
+    const STORY_URL_BASE = "https://www.disturbingstories.com/";
 
-  <button id="spinBtn">▶ GIRAR</button>
+/* ====== AUDIO v3 ======
+   - ruletaloop.mp3: loop mientras gira
+   - ruletastop.mp3: una vez al detener
+*/
+const rouletteLoopAudio = new Audio("imagenes/assets/ruletaloop.mp3");
+rouletteLoopAudio.loop = true;
 
-  <div id="readStory">📖 LEER HISTORIA</div>
+const rouletteStopAudio = new Audio("imagenes/assets/ruletastop.mp3");
 
-</div>
-
-<script>
-/* =======================
-   AUDIO
-======================= */
-const audioLoop = new Audio("imagenes/assets/ruletaloop.mp3");
-audioLoop.loop = true;
-
-const audioStop = new Audio("imagenes/assets/ruletastop.mp3");
-
-/* =======================
-   RULETA LOGICA
-======================= */
-const btn = document.getElementById("spinBtn");
-const thumbs = document.querySelectorAll(".thumb");
-
-let spinning = false;
-let interval = null;
-
-function randomImage() {
-  const n = Math.floor(Math.random() * 6) + 1;
-  return `imagenes/assets/thumb${n}.jpg`;
+function playRouletteLoop(){
+  try{
+    rouletteStopAudio.pause();
+    rouletteStopAudio.currentTime = 0;
+    rouletteLoopAudio.currentTime = 0;
+    const p = rouletteLoopAudio.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  }catch(e){}
 }
 
-function spin() {
-  interval = setInterval(() => {
-    thumbs.forEach(t => t.style.backgroundImage = `url(${randomImage()})`);
-  }, 100);
+function stopRouletteLoop(){
+  try{
+    rouletteLoopAudio.pause();
+    rouletteLoopAudio.currentTime = 0;
+  }catch(e){}
 }
 
-btn.addEventListener("click", () => {
-  if (!spinning) {
-    // GIRAR
-    spinning = true;
-    btn.classList.add("spinning");
-    btn.textContent = "■ DETENER";
-    audioStop.pause();
-    audioStop.currentTime = 0;
-    audioLoop.currentTime = 0;
-    audioLoop.play();
-    spin();
-  } else {
-    // DETENER
-    spinning = false;
-    btn.classList.remove("spinning");
-    btn.textContent = "▶ GIRAR";
-    clearInterval(interval);
-    audioLoop.pause();
-    audioLoop.currentTime = 0;
-    audioStop.play();
-  }
-});
+function playRouletteStopOnce(){
+  try{
+    rouletteStopAudio.currentTime = 0;
+    const p = rouletteStopAudio.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  }catch(e){}
+}
 
-/* imagenes iniciales random */
-thumbs.forEach(t => t.style.backgroundImage = `url(${randomImage()})`);
-</script>
+    let allStories = [];
+    let stories = [];
+    let spinning = false;
+    let intervalId = null;
+    let currentIndex = -1;
+    let currentCategory = "all";
 
+    const statusEl = document.getElementById("status");
+    const drumRowEl = document.getElementById("drum-row");
+    const previewImgEl = document.getElementById("preview-image");
+    const previewTitleEl = document.getElementById("preview-title");
+    const previewSubtitleEl = document.getElementById("preview-subtitle");
+    const spinBtn = document.getElementById("spin-toggle-button");
+    const spinLabelEl = document.getElementById("spin-toggle-label");
+    const categorySelectEl = document.getElementById("category-select");
+
+    const selectedBoxEl = document.getElementById("selected-story");
+    const selectedImageEl = document.getElementById("selected-image");
+    const selectedTitleEl = document.getElementById("selected-title");
+    const selectedMetaEl = document.getElementById("selected-meta");
+    const selectedSynopsisEl = document.getElementById("selected-synopsis");
+    const readLinkEl = document.getElementById("read-link");
+
+    function safeRandomIndex(max){
+      return Math.floor(Math.random() * max);
+    }
+
+    function updateStatus(){
+      statusEl.textContent = "Historias disponibles: " + stories.length;
+    }
+
+    function updatePreview(story){
+      previewImgEl.src = story.image;
+      previewImgEl.alt = story.title;
+      previewTitleEl.textContent = story.title + " (ID: " + story.id + ")";
+    }
+
+    function pickRandomDifferentIndex(){
+      if (stories.length <= 1) {
+        currentIndex = 0;
+        return 0;
+      }
+      let idx;
+      do { idx = safeRandomIndex(stories.length); }
+      while (idx === currentIndex);
+      currentIndex = idx;
+      return idx;
+    }
+
+    function setRandomPreviewOnLoad(){
+      if (stories.length === 0) return;
+      currentIndex = safeRandomIndex(stories.length);
+      updatePreview(stories[currentIndex]);
+      previewSubtitleEl.textContent = "Pulsa «Girar» para empezar.";
+    }
+
+    
+    function setSpinButtonState(isSpinning){
+      // Toggle button visuals between "Girar" and "Detener"
+      spinBtn.classList.toggle("is-spinning", isSpinning);
+      if (spinLabelEl) spinLabelEl.textContent = isSpinning ? "Detener" : "Girar";
+      // Swap primary/secondary styling
+      spinBtn.classList.toggle("btn-secondary", isSpinning);
+      spinBtn.classList.toggle("btn-primary", !isSpinning);
+      // Accessible label
+      spinBtn.setAttribute("aria-label", isSpinning ? "Detener" : "Girar");
+    }
+
+function stopSpinning(){
+      if (!spinning) return;
+
+      spinning = false;
+      spinBtn.disabled = false;
+      setSpinButtonState(false);
+      setSpinButtonState(false);
+      previewSubtitleEl.textContent = "Esta es la historia que ha tocado.";
+      drumRowEl.classList.remove("spinning");
+
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+
+      // v3 audio: parar loop y sonar stop una vez
+      stopRouletteLoop();
+      playRouletteStopOnce();
+
+      const story = stories[currentIndex];
+      updatePreview(story);
+      showSelectedStory(story);
+    }
+
+    function startSpinning(){
+      if (spinning || stories.length === 0) return;
+
+      spinning = true;
+      spinBtn.disabled = false;
+      setSpinButtonState(true);
+      setSpinButtonState(true);
+      selectedBoxEl.classList.add("hidden");
+      previewSubtitleEl.textContent = "La ruleta está girando…";
+      drumRowEl.classList.add("spinning");
+
+      // v3 audio: loop mientras gira
+      playRouletteLoop();
+
+      intervalId = setInterval(() => {
+        const idx = pickRandomDifferentIndex();
+        updatePreview(stories[idx]);
+      }, 80);
+    }
+
+    function showSelectedStory(story){
+      selectedImageEl.src = story.image;
+      selectedImageEl.alt = story.title;
+      selectedTitleEl.textContent = story.title;
+
+      const metaParts = [];
+
+      if (story.year) metaParts.push('<span class="meta-pill">' + story.year + '</span>');
+
+      if (story.categories && story.categories.length > 0) {
+        story.categories.forEach(cat => {
+          metaParts.push('<span class="meta-pill meta-tag">' + cat + '</span>');
+        });
+      }
+
+      selectedMetaEl.innerHTML = metaParts.join("");
+      selectedSynopsisEl.textContent = story.synopsis || "";
+      readLinkEl.href = story.url;
+
+      selectedBoxEl.classList.remove("hidden");
+    }
+
+    function buildCategoryOptions(sourceStories){
+      const cats = new Set();
+      sourceStories.forEach(story => (story.categories || []).forEach(cat => cats.add(cat)));
+
+      while (categorySelectEl.options.length > 1) categorySelectEl.remove(1);
+
+      Array.from(cats).sort().forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelectEl.appendChild(opt);
+      });
+    }
+
+    function applyCategoryFilter(){
+      if (spinning) stopSpinning();
+
+      if (currentCategory === "all") {
+        stories = allStories.slice();
+      } else {
+        stories = allStories.filter(story => (story.categories || []).includes(currentCategory));
+      }
+
+      if (stories.length === 0) {
+        spinBtn.disabled = true;
+        previewTitleEl.textContent = "No hay historias para esta categoría.";
+        previewSubtitleEl.textContent = "Prueba a cambiar el filtro.";
+        previewImgEl.src = "";
+        selectedBoxEl.classList.add("hidden");
+        statusEl.textContent = "Historias disponibles: 0";
+        return;
+      }
+
+      spinBtn.disabled = false;
+      setSpinButtonState(false);
+      selectedBoxEl.classList.add("hidden");
+
+      setRandomPreviewOnLoad();  // SIEMPRE random al cargar o cambiar categoría
+      updateStatus();
+    }
+
+    async function loadStories(){
+      try{
+        statusEl.textContent = "Cargando historias…";
+
+        const res = await fetch(STORIES_URL);
+        if (!res.ok) throw new Error("No se ha encontrado admin/metadata.json (" + res.status + ")");
+
+        const data = await res.json();
+        const todayStr = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+
+        const mapped = Object
+          .entries(data)
+          .filter(([id]) => /^\d{3}$/.test(id))
+          .map(([id, item]) => ({
+            id,
+            title: item.titulo || "Historia sin título",
+            synopsis: item.sinopsis || "",
+            year: item.anio || "",
+            categories: Array.isArray(item.categorias) ? item.categorias : [],
+            date: item.fecha || "",
+            image: IMAGE_BASE_PATH + id + ".jpg",
+            url: STORY_URL_BASE + id + ".html"
+          }))
+          .filter(story => !story.date || story.date <= todayStr);
+
+        allStories = mapped;
+
+        if (allStories.length === 0) {
+          throw new Error("No hay historias disponibles con ID de 3 dígitos.");
+        }
+
+        buildCategoryOptions(allStories);
+        applyCategoryFilter();
+
+      }catch(e){
+        console.error("Error cargando historias:", e);
+        statusEl.textContent = "ERROR: " + e.message;
+        spinBtn.disabled = true;
+        previewTitleEl.textContent = "No se han podido cargar las historias.";
+        previewSubtitleEl.textContent = "Revisa la ruta y el formato de admin/metadata.json.";
+      }
+    }
+
+    spinBtn.addEventListener("click", () => {
+      if (spinning) stopSpinning();
+      else startSpinning();
+    });
+
+    categorySelectEl.addEventListener("change", () => {
+      currentCategory = categorySelectEl.value;
+      applyCategoryFilter();
+    });
+
+    loadStories();
+  </script>
 </body>
 </html>
