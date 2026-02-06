@@ -320,7 +320,6 @@
     .controls-row{
       margin-top: 10px;
       display:flex;
-      gap:10px;
       position:relative;
       z-index:4;
     }
@@ -351,6 +350,18 @@
       filter: grayscale(.35);
       box-shadow:none;
     }
+
+    .btn-wide{
+      width: 100%;
+      justify-content: center;
+    }
+    #spin-toggle-button{
+      gap: 10px;
+    }
+    #spin-toggle-button .stop-icon{ display:none; }
+    #spin-toggle-button.is-spinning .spin-icon{ display:none; }
+    #spin-toggle-button.is-spinning .stop-icon{ display:inline-block; }
+
     .btn:not(:disabled):active{
       transform: translateY(1px) scale(.985);
     }
@@ -408,6 +419,7 @@
     /* ====== STATUS ====== */
     #status{
       margin-top: 8px;
+      text-align: center;
       font-size: 11px;
       color: var(--muted);
       min-height: 14px;
@@ -569,13 +581,10 @@
         </div>
 
         <div class="controls-row">
-          <button id="start-button" class="btn btn-primary" disabled>
-            <span class="icon icon-dice" aria-hidden="true">🎲</span>
-            Girar
-          </button>
-          <button id="stop-button" class="btn btn-secondary" disabled>
-            <span class="icon icon-stop" aria-hidden="true">✋</span>
-            Detener
+          <button id="spin-toggle-button" class="btn btn-primary btn-wide" disabled aria-live="polite">
+            <span class="icon icon-dice spin-icon" aria-hidden="true">🎲</span>
+            <span class="icon icon-stop stop-icon" aria-hidden="true">✋</span>
+            <span class="btn-label" id="spin-toggle-label">Girar</span>
           </button>
         </div>
 
@@ -618,8 +627,8 @@
     const previewImgEl = document.getElementById("preview-image");
     const previewTitleEl = document.getElementById("preview-title");
     const previewSubtitleEl = document.getElementById("preview-subtitle");
-    const startBtn = document.getElementById("start-button");
-    const stopBtn = document.getElementById("stop-button");
+    const spinBtn = document.getElementById("spin-toggle-button");
+    const spinLabelEl = document.getElementById("spin-toggle-label");
     const categorySelectEl = document.getElementById("category-select");
 
     const selectedBoxEl = document.getElementById("selected-story");
@@ -662,12 +671,25 @@
       previewSubtitleEl.textContent = "Pulsa «Girar» para empezar.";
     }
 
-    function stopSpinning(){
+    
+    function setSpinButtonState(isSpinning){
+      // Toggle button visuals between "Girar" and "Detener"
+      spinBtn.classList.toggle("is-spinning", isSpinning);
+      if (spinLabelEl) spinLabelEl.textContent = isSpinning ? "Detener" : "Girar";
+      // Swap primary/secondary styling
+      spinBtn.classList.toggle("btn-secondary", isSpinning);
+      spinBtn.classList.toggle("btn-primary", !isSpinning);
+      // Accessible label
+      spinBtn.setAttribute("aria-label", isSpinning ? "Detener" : "Girar");
+    }
+
+function stopSpinning(){
       if (!spinning) return;
 
       spinning = false;
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
+      spinBtn.disabled = false;
+      setSpinButtonState(false);
+      setSpinButtonState(false);
       previewSubtitleEl.textContent = "Esta es la historia que ha tocado.";
       drumRowEl.classList.remove("spinning");
 
@@ -685,8 +707,9 @@
       if (spinning || stories.length === 0) return;
 
       spinning = true;
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
+      spinBtn.disabled = false;
+      setSpinButtonState(true);
+      setSpinButtonState(true);
       selectedBoxEl.classList.add("hidden");
       previewSubtitleEl.textContent = "La ruleta está girando…";
       drumRowEl.classList.add("spinning");
@@ -743,8 +766,7 @@
       }
 
       if (stories.length === 0) {
-        startBtn.disabled = true;
-        stopBtn.disabled = true;
+        spinBtn.disabled = true;
         previewTitleEl.textContent = "No hay historias para esta categoría.";
         previewSubtitleEl.textContent = "Prueba a cambiar el filtro.";
         previewImgEl.src = "";
@@ -753,8 +775,8 @@
         return;
       }
 
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
+      spinBtn.disabled = false;
+      setSpinButtonState(false);
       selectedBoxEl.classList.add("hidden");
 
       setRandomPreviewOnLoad();  // SIEMPRE random al cargar o cambiar categoría
@@ -798,15 +820,16 @@
       }catch(e){
         console.error("Error cargando historias:", e);
         statusEl.textContent = "ERROR: " + e.message;
-        startBtn.disabled = true;
-        stopBtn.disabled = true;
+        spinBtn.disabled = true;
         previewTitleEl.textContent = "No se han podido cargar las historias.";
         previewSubtitleEl.textContent = "Revisa la ruta y el formato de admin/metadata.json.";
       }
     }
 
-    startBtn.addEventListener("click", startSpinning);
-    stopBtn.addEventListener("click", stopSpinning);
+    spinBtn.addEventListener("click", () => {
+      if (spinning) stopSpinning();
+      else startSpinning();
+    });
 
     categorySelectEl.addEventListener("change", () => {
       currentCategory = categorySelectEl.value;
