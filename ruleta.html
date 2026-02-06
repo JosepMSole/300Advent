@@ -45,9 +45,10 @@
     #story-widget{
       position:relative;
       border-radius: var(--radius-xl);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(148, 163, 184, .18);
       box-shadow: var(--shadow);
-      background: linear-gradient(165deg, var(--panel2), var(--panel));
+      /* v2.1: quitamos el bloque oscuro para no tapar el skin */
+      background: transparent;
       padding: 16px 16px 14px;
       overflow:hidden;
       isolation:isolate; /* para blend modes */
@@ -136,6 +137,22 @@
       font-size: 28px; /* grande */
       position:relative;
       filter: drop-shadow(0 6px 14px rgba(0,0,0,.75));
+      /* v2.1: movimiento más evidente */
+      animation: titleRumble 1.05s steps(2) infinite;
+    }
+
+    @keyframes titleRumble{
+      0%{ transform: translate(0,0) skew(0deg); }
+      10%{ transform: translate(-1px, 0) skew(-.5deg); }
+      20%{ transform: translate(2px, -1px) skew(.6deg); }
+      30%{ transform: translate(-2px, 1px) skew(-.8deg); }
+      40%{ transform: translate(1px, 0) skew(.4deg); }
+      50%{ transform: translate(0, -1px) skew(-.3deg); }
+      60%{ transform: translate(2px, 1px) skew(.8deg); }
+      70%{ transform: translate(-1px, 0) skew(-.6deg); }
+      80%{ transform: translate(1px, -1px) skew(.5deg); }
+      90%{ transform: translate(-2px, 1px) skew(-.7deg); }
+      100%{ transform: translate(0,0) skew(0deg); }
     }
 
     /* Glitch sutil en el título */
@@ -159,24 +176,30 @@
     .title-row .glitch::before{
       transform: translateX(-1px);
       color: rgba(124,58,237,.85);
-      animation: glitchA 2.6s infinite;
+      animation: glitchA 1.4s infinite;
     }
     .title-row .glitch::after{
       transform: translateX(1px);
       color: rgba(225,29,72,.85);
-      animation: glitchB 2.1s infinite;
+      animation: glitchB 1.2s infinite;
     }
     @keyframes glitchA{
-      0%, 95%, 100%{ clip-path: inset(0 0 0 0); }
-      96%{ clip-path: inset(12% 0 72% 0); transform: translate(-2px,0); }
-      97%{ clip-path: inset(62% 0 18% 0); transform: translate(2px,0); }
-      98%{ clip-path: inset(30% 0 44% 0); transform: translate(-1px,0); }
+      0%, 8%, 100%{ clip-path: inset(0 0 0 0); transform: translate(-1px,0); }
+      10%{ clip-path: inset(10% 0 70% 0); transform: translate(-5px,-1px); }
+      14%{ clip-path: inset(60% 0 18% 0); transform: translate(6px,1px); }
+      18%{ clip-path: inset(28% 0 44% 0); transform: translate(-4px,0); }
+      36%{ clip-path: inset(48% 0 28% 0); transform: translate(5px,-1px); }
+      58%{ clip-path: inset(8% 0 74% 0); transform: translate(-6px,1px); }
+      82%{ clip-path: inset(72% 0 10% 0); transform: translate(4px,0); }
     }
     @keyframes glitchB{
-      0%, 92%, 100%{ clip-path: inset(0 0 0 0); }
-      93%{ clip-path: inset(55% 0 22% 0); transform: translate(3px,0); }
-      94%{ clip-path: inset(20% 0 62% 0); transform: translate(-3px,0); }
-      95%{ clip-path: inset(72% 0 12% 0); transform: translate(1px,0); }
+      0%, 6%, 100%{ clip-path: inset(0 0 0 0); transform: translate(1px,0); }
+      12%{ clip-path: inset(52% 0 22% 0); transform: translate(7px,0); }
+      16%{ clip-path: inset(18% 0 62% 0); transform: translate(-7px,1px); }
+      22%{ clip-path: inset(72% 0 10% 0); transform: translate(5px,-1px); }
+      44%{ clip-path: inset(22% 0 58% 0); transform: translate(-6px,0); }
+      66%{ clip-path: inset(62% 0 18% 0); transform: translate(6px,-1px); }
+      88%{ clip-path: inset(12% 0 74% 0); transform: translate(-5px,1px); }
     }
 
     .widget-subtitle{
@@ -220,7 +243,8 @@
       display:flex;
       gap: 12px;
       align-items:center;
-      min-height: 112px; /* fijo para que no “salte” */
+      /* más alto para miniatura 9:16 */
+      min-height: 190px; /* fijo para que no “salte” */
       position:relative;
       overflow:hidden;
     }
@@ -236,8 +260,9 @@
     }
 
     .drum-image-wrapper{
-      flex: 0 0 30%;
-      max-width: 120px;
+      flex: 0 0 26%;
+      max-width: 108px;
+      aspect-ratio: 9 / 16;
       border-radius: 14px;
       overflow:hidden;
       border: 1px solid rgba(148, 163, 184, .22);
@@ -254,7 +279,7 @@
 
     #preview-image{
       width:100%;
-      height: 84px; /* fijo para evitar reflow */
+      height: 100%;
       display:block;
       object-fit: cover;
       transition: transform 120ms linear;
@@ -407,9 +432,10 @@
 
     .selected-inner{ display:flex; gap:10px; align-items:flex-start; }
     #selected-image{
-      flex: 0 0 30%;
-      max-width: 110px;
-      height: 88px;
+      flex: 0 0 26%;
+      width: 96px;
+      height: calc(96px * 16 / 9);
+      aspect-ratio: 9 / 16;
       border-radius: 12px;
       object-fit: cover;
       border: 1px solid rgba(148, 163, 184, .22);
@@ -473,6 +499,21 @@
       white-space: nowrap;
     }
     #read-link:hover{ transform: translateY(-1px) scale(1.02); filter: brightness(1.08); }
+
+    /* v2.1: animación del icono "LEER HISTORIA" */
+    #read-link .icon-read{
+      display:inline-block;
+      transform-origin: 50% 70%;
+      animation: bookWiggle 1.15s ease-in-out infinite;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.55));
+    }
+    @keyframes bookWiggle{
+      0%{ transform: translateY(0) rotate(0deg) scale(1); }
+      25%{ transform: translateY(-2px) rotate(-10deg) scale(1.02); }
+      50%{ transform: translateY(1px) rotate(8deg) scale(1.04); }
+      75%{ transform: translateY(-1px) rotate(-6deg) scale(1.02); }
+      100%{ transform: translateY(0) rotate(0deg) scale(1); }
+    }
 
     /* Micro-glitch en el panel cuando gira */
     .drum-row.spinning{
@@ -549,7 +590,7 @@
               <div id="selected-meta"></div>
               <p id="selected-synopsis"></p>
               <a id="read-link" href="#" target="_parent" rel="noopener">
-                <span aria-hidden="true">📖</span>
+                <span class="icon-read" aria-hidden="true">📖</span>
                 <span>Leer historia completa</span>
               </a>
             </div>
