@@ -249,36 +249,69 @@
       overflow:hidden;
     }
 
-    .drum-row.stop-glitch{
-      animation: stopGlitchMove .5s linear both;
-      box-shadow: 0 0 18px rgba(255,77,46,.22), 0 0 44px rgba(124,58,237,.18);
-      filter: saturate(1.2) contrast(1.12) brightness(1.08);
-    }
-    .drum-row.stop-glitch::after{
-      content:"";
+    
+    /* ====== STOP GLITCH (v4_3): efecto loco al DETENER sobre TODA la caja grande ====== */
+    .stop-glitch-overlay{
       position:absolute;
       inset:-2px;
       pointer-events:none;
+      z-index:2; /* por encima de scanlines (#story-widget::after) y debajo del contenido (.layer z=3) */
+      opacity:0;
       background:
-        linear-gradient(90deg, rgba(255,77,46,.16), rgba(225,29,72,.10), rgba(124,58,237,.14)),
-        repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0px, rgba(255,255,255,.04) 2px, rgba(0,0,0,0) 6px, rgba(0,0,0,0) 10px);
+        linear-gradient(90deg, rgba(255,77,46,.22), rgba(225,29,72,.14), rgba(124,58,237,.20)),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.14) 0px, rgba(255,255,255,.06) 2px, rgba(0,0,0,0) 7px, rgba(0,0,0,0) 12px);
       mix-blend-mode: screen;
-      opacity:.0;
-      animation: stopGlitchFlicker .5s steps(6) both;
+      filter: saturate(1.4) contrast(1.25);
+      transform: translate3d(0,0,0);
     }
+
+    #story-widget.stop-glitch{
+      animation: stopGlitchMove .5s linear both;
+      box-shadow: 0 0 24px rgba(255,77,46,.28), 0 0 70px rgba(124,58,237,.26), var(--shadow);
+      filter: saturate(1.35) contrast(1.18) brightness(1.10) hue-rotate(10deg);
+    }
+
+    #story-widget.stop-glitch .stop-glitch-overlay{
+      animation: stopGlitchFlicker .5s steps(10) both;
+    }
+
+    #story-widget.stop-glitch .layer{
+      /* micro-shake extra del contenido para que se note que se mueve TODO */
+      animation: stopGlitchInner .5s steps(2) both;
+    }
+
     @keyframes stopGlitchMove{
       0%   { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
-      10%  { transform: translate3d(-6px, 3px,0) rotate(-0.7deg) scale(1.01); }
-      20%  { transform: translate3d(5px, -4px,0) rotate(0.8deg) scale(1.015); }
-      30%  { transform: translate3d(-4px, -2px,0) rotate(-0.5deg) scale(1.01); }
-      45%  { transform: translate3d(7px, 4px,0) rotate(0.6deg) scale(1.02); }
-      60%  { transform: translate3d(-3px, 2px,0) rotate(-0.4deg) scale(1.01); }
-      75%  { transform: translate3d(4px, -3px,0) rotate(0.5deg) scale(1.015); }
+      8%   { transform: translate3d(-10px, 6px,0) rotate(-1.2deg) scale(1.02); }
+      16%  { transform: translate3d(12px, -8px,0) rotate(1.4deg) scale(1.03); }
+      26%  { transform: translate3d(-9px, -5px,0) rotate(-1.0deg) scale(1.02); }
+      38%  { transform: translate3d(14px, 9px,0) rotate(1.1deg) scale(1.04); }
+      52%  { transform: translate3d(-7px, 6px,0) rotate(-.9deg) scale(1.02); }
+      68%  { transform: translate3d(10px, -7px,0) rotate(1.0deg) scale(1.03); }
+      84%  { transform: translate3d(-6px, 4px,0) rotate(-.7deg) scale(1.02); }
       100% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
     }
+
     @keyframes stopGlitchFlicker{
-      0%   { opacity: 0; transform: translate3d(0,0,0); filter: hue-rotate(0deg); }
-      12%  { opacity: .85; transform: translate3d(-2%,0,0); }
+      0%   { opacity: 0; transform: translate3d(0,0,0) skew(0deg); filter: hue-rotate(0deg); }
+      10%  { opacity: .95; transform: translate3d(-3%,0,0) skew(-2deg); }
+      18%  { opacity: .25; transform: translate3d(3%,-1%,0) skew(2deg); }
+      28%  { opacity: 1; transform: translate3d(-4%,1%,0) skew(-3deg); filter: hue-rotate(35deg); }
+      40%  { opacity: .18; transform: translate3d(4%,0,0) skew(2deg); }
+      54%  { opacity: .9; transform: translate3d(-2%,1%,0) skew(-2deg); filter: hue-rotate(-25deg); }
+      70%  { opacity: .32; transform: translate3d(2%,-1%,0) skew(2deg); }
+      86%  { opacity: .85; transform: translate3d(-3%,1%,0) skew(-2deg); }
+      100% { opacity: 0; transform: translate3d(0,0,0) skew(0deg); filter: hue-rotate(0deg); }
+    }
+
+    @keyframes stopGlitchInner{
+      0%, 100% { transform: translate3d(0,0,0); }
+      20% { transform: translate3d(1px,-1px,0); }
+      40% { transform: translate3d(-2px,1px,0); }
+      60% { transform: translate3d(2px,1px,0); }
+      80% { transform: translate3d(-1px,-2px,0); }
+    }
+12%  { opacity: .85; transform: translate3d(-2%,0,0); }
       24%  { opacity: .35; transform: translate3d(2%,-1%,0); }
       36%  { opacity: .95; transform: translate3d(-3%,1%,0); filter: hue-rotate(25deg); }
       50%  { opacity: .25; transform: translate3d(3%,0,0); }
@@ -589,6 +622,7 @@
   <div class="app">
     <div id="story-widget">
       <div class="noise" aria-hidden="true"></div>
+      <div class="stop-glitch-overlay" aria-hidden="true"></div>
 
       <div class="layer">
         <div class="widget-header">
@@ -695,6 +729,7 @@ function playRouletteStopOnce(){
     let currentCategory = "all";
 
     const statusEl = document.getElementById("status");
+    const widgetEl = document.getElementById("story-widget");
     const drumRowEl = document.getElementById("drum-row");
     const previewImgEl = document.getElementById("preview-image");
     const previewTitleEl = document.getElementById("preview-title");
@@ -765,11 +800,13 @@ function stopSpinning(){
       setSpinButtonState(false);
       previewSubtitleEl.textContent = "Pulsa «Girar» para otra story.";
       drumRowEl.classList.remove("spinning");
-      // v_2: efecto luminoso + glitch al detener (0.5s)
-      drumRowEl.classList.remove("stop-glitch");
-      void drumRowEl.offsetWidth; // reflow para reiniciar animación
-      drumRowEl.classList.add("stop-glitch");
-      setTimeout(() => drumRowEl.classList.remove("stop-glitch"), 520);
+      // v4_3: efecto luminoso + glitch al detener (0.5s) SOBRE TODA LA CAJA GRANDE
+      if (widgetEl){
+        widgetEl.classList.remove("stop-glitch");
+        void widgetEl.offsetWidth; // reflow para reiniciar animación
+        widgetEl.classList.add("stop-glitch");
+        setTimeout(() => widgetEl.classList.remove("stop-glitch"), 520);
+      }
 
       if (intervalId) {
         clearInterval(intervalId);
