@@ -249,69 +249,36 @@
       overflow:hidden;
     }
 
-    
-    /* ====== STOP GLITCH (v4_3): efecto loco al DETENER sobre TODA la caja grande ====== */
-    .stop-glitch-overlay{
+    .drum-row.stop-glitch{
+      animation: stopGlitchMove .5s linear both;
+      box-shadow: 0 0 18px rgba(255,77,46,.22), 0 0 44px rgba(124,58,237,.18);
+      filter: saturate(1.2) contrast(1.12) brightness(1.08);
+    }
+    .drum-row.stop-glitch::after{
+      content:"";
       position:absolute;
       inset:-2px;
       pointer-events:none;
-      z-index:2; /* por encima de scanlines (#story-widget::after) y debajo del contenido (.layer z=3) */
-      opacity:0;
       background:
-        linear-gradient(90deg, rgba(255,77,46,.22), rgba(225,29,72,.14), rgba(124,58,237,.20)),
-        repeating-linear-gradient(0deg, rgba(255,255,255,.14) 0px, rgba(255,255,255,.06) 2px, rgba(0,0,0,0) 7px, rgba(0,0,0,0) 12px);
+        linear-gradient(90deg, rgba(255,77,46,.16), rgba(225,29,72,.10), rgba(124,58,237,.14)),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0px, rgba(255,255,255,.04) 2px, rgba(0,0,0,0) 6px, rgba(0,0,0,0) 10px);
       mix-blend-mode: screen;
-      filter: saturate(1.4) contrast(1.25);
-      transform: translate3d(0,0,0);
+      opacity:.0;
+      animation: stopGlitchFlicker .5s steps(6) both;
     }
-
-    #story-widget.stop-glitch{
-      animation: stopGlitchMove .5s linear both;
-      box-shadow: 0 0 24px rgba(255,77,46,.28), 0 0 70px rgba(124,58,237,.26), var(--shadow);
-      filter: saturate(1.35) contrast(1.18) brightness(1.10) hue-rotate(10deg);
-    }
-
-    #story-widget.stop-glitch .stop-glitch-overlay{
-      animation: stopGlitchFlicker .5s steps(10) both;
-    }
-
-    #story-widget.stop-glitch .layer{
-      /* micro-shake extra del contenido para que se note que se mueve TODO */
-      animation: stopGlitchInner .5s steps(2) both;
-    }
-
     @keyframes stopGlitchMove{
       0%   { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
-      8%   { transform: translate3d(-10px, 6px,0) rotate(-1.2deg) scale(1.02); }
-      16%  { transform: translate3d(12px, -8px,0) rotate(1.4deg) scale(1.03); }
-      26%  { transform: translate3d(-9px, -5px,0) rotate(-1.0deg) scale(1.02); }
-      38%  { transform: translate3d(14px, 9px,0) rotate(1.1deg) scale(1.04); }
-      52%  { transform: translate3d(-7px, 6px,0) rotate(-.9deg) scale(1.02); }
-      68%  { transform: translate3d(10px, -7px,0) rotate(1.0deg) scale(1.03); }
-      84%  { transform: translate3d(-6px, 4px,0) rotate(-.7deg) scale(1.02); }
+      10%  { transform: translate3d(-6px, 3px,0) rotate(-0.7deg) scale(1.01); }
+      20%  { transform: translate3d(5px, -4px,0) rotate(0.8deg) scale(1.015); }
+      30%  { transform: translate3d(-4px, -2px,0) rotate(-0.5deg) scale(1.01); }
+      45%  { transform: translate3d(7px, 4px,0) rotate(0.6deg) scale(1.02); }
+      60%  { transform: translate3d(-3px, 2px,0) rotate(-0.4deg) scale(1.01); }
+      75%  { transform: translate3d(4px, -3px,0) rotate(0.5deg) scale(1.015); }
       100% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
     }
-
     @keyframes stopGlitchFlicker{
-      0%   { opacity: 0; transform: translate3d(0,0,0) skew(0deg); filter: hue-rotate(0deg); }
-      10%  { opacity: .95; transform: translate3d(-3%,0,0) skew(-2deg); }
-      18%  { opacity: .25; transform: translate3d(3%,-1%,0) skew(2deg); }
-      28%  { opacity: 1; transform: translate3d(-4%,1%,0) skew(-3deg); filter: hue-rotate(35deg); }
-      40%  { opacity: .18; transform: translate3d(4%,0,0) skew(2deg); }
-      54%  { opacity: .9; transform: translate3d(-2%,1%,0) skew(-2deg); filter: hue-rotate(-25deg); }
-      70%  { opacity: .32; transform: translate3d(2%,-1%,0) skew(2deg); }
-      86%  { opacity: .85; transform: translate3d(-3%,1%,0) skew(-2deg); }
-      100% { opacity: 0; transform: translate3d(0,0,0) skew(0deg); filter: hue-rotate(0deg); }
-    }
-
-    @keyframes stopGlitchInner{
-      0%, 100% { transform: translate3d(0,0,0); }
-      20% { transform: translate3d(1px,-1px,0); }
-      40% { transform: translate3d(-2px,1px,0); }
-      60% { transform: translate3d(2px,1px,0); }
-      80% { transform: translate3d(-1px,-2px,0); }
-    }
-12%  { opacity: .85; transform: translate3d(-2%,0,0); }
+      0%   { opacity: 0; transform: translate3d(0,0,0); filter: hue-rotate(0deg); }
+      12%  { opacity: .85; transform: translate3d(-2%,0,0); }
       24%  { opacity: .35; transform: translate3d(2%,-1%,0); }
       36%  { opacity: .95; transform: translate3d(-3%,1%,0); filter: hue-rotate(25deg); }
       50%  { opacity: .25; transform: translate3d(3%,0,0); }
@@ -615,17 +582,51 @@
       #preview-title{ font-size: 12.5px; }
       .selected-story{ min-height: 200px; }
     }
-  </style>
+  
+#audio-toggle{
+  position:absolute;
+  top:14px;
+  right:16px;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(0,0,0,.5);
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+  opacity:.5;
+  z-index:5;
+}
+#audio-toggle.off{ opacity:.35; filter: grayscale(1); }
+
+#story-widget.global-glitch{
+  animation: globalGlitch .5s linear both;
+  box-shadow: 0 0 30px rgba(255,77,46,.35), 0 0 60px rgba(124,58,237,.25);
+  filter: saturate(1.25) contrast(1.2);
+}
+@keyframes globalGlitch{
+  0%{ transform:translate(0,0) scale(1); }
+  15%{ transform:translate(-6px,3px) skew(-1deg); }
+  30%{ transform:translate(5px,-4px) skew(1deg); }
+  45%{ transform:translate(-4px,2px); }
+  60%{ transform:translate(6px,-3px) scale(1.02); }
+  100%{ transform:translate(0,0) scale(1); }
+}
+
+</style>
 </head>
 
 <body>
   <div class="app">
     <div id="story-widget">
       <div class="noise" aria-hidden="true"></div>
-      <div class="stop-glitch-overlay" aria-hidden="true"></div>
 
       <div class="layer">
         <div class="widget-header">
+
+<button id="audio-toggle" aria-label="Audio on/off">🔊</button>
+
           <div class="widget-title">
             <div class="title-row">
               <span class="glitch" data-text="RANDOM STORY">RANDOM STORY</span>
@@ -729,7 +730,6 @@ function playRouletteStopOnce(){
     let currentCategory = "all";
 
     const statusEl = document.getElementById("status");
-    const widgetEl = document.getElementById("story-widget");
     const drumRowEl = document.getElementById("drum-row");
     const previewImgEl = document.getElementById("preview-image");
     const previewTitleEl = document.getElementById("preview-title");
@@ -800,13 +800,11 @@ function stopSpinning(){
       setSpinButtonState(false);
       previewSubtitleEl.textContent = "Pulsa «Girar» para otra story.";
       drumRowEl.classList.remove("spinning");
-      // v4_3: efecto luminoso + glitch al detener (0.5s) SOBRE TODA LA CAJA GRANDE
-      if (widgetEl){
-        widgetEl.classList.remove("stop-glitch");
-        void widgetEl.offsetWidth; // reflow para reiniciar animación
-        widgetEl.classList.add("stop-glitch");
-        setTimeout(() => widgetEl.classList.remove("stop-glitch"), 520);
-      }
+      // v_2: efecto luminoso + glitch al detener (0.5s)
+      drumRowEl.classList.remove("stop-glitch");
+      void drumRowEl.offsetWidth; // reflow para reiniciar animación
+      drumRowEl.classList.add("stop-glitch");
+      setTimeout(() => drumRowEl.classList.remove("stop-glitch"), 520);
 
       if (intervalId) {
         clearInterval(intervalId);
@@ -816,6 +814,7 @@ function stopSpinning(){
       // v3 audio: parar loop y sonar stop una vez
       stopRouletteLoop();
       playRouletteStopOnce();
+      triggerGlobalGlitch();
 
       const story = stories[currentIndex];
       if (previewLabelEl) previewLabelEl.hidden = false;
@@ -967,7 +966,27 @@ function stopSpinning(){
       }
     }
 
-    spinBtn.addEventListener("click", () => {
+    
+const widgetEl = document.getElementById("story-widget");
+const audioToggleBtn = document.getElementById("audio-toggle");
+let audioEnabled = true;
+
+audioToggleBtn.addEventListener("click", ()=>{
+  audioEnabled = !audioEnabled;
+  audioToggleBtn.textContent = audioEnabled ? "🔊" : "🔇";
+  audioToggleBtn.classList.toggle("off", !audioEnabled);
+  rouletteLoopAudio.muted = !audioEnabled;
+  rouletteStopAudio.muted = !audioEnabled;
+});
+
+function triggerGlobalGlitch(){
+  widgetEl.classList.remove("global-glitch");
+  void widgetEl.offsetWidth;
+  widgetEl.classList.add("global-glitch");
+  setTimeout(()=>widgetEl.classList.remove("global-glitch"), 520);
+}
+
+spinBtn.addEventListener("click", () => {
       if (spinning) stopSpinning();
       else startSpinning();
     });
