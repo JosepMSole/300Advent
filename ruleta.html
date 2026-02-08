@@ -248,6 +248,44 @@
       position:relative;
       overflow:hidden;
     }
+
+    .drum-row.stop-glitch{
+      animation: stopGlitchMove .5s linear both;
+      box-shadow: 0 0 18px rgba(255,77,46,.22), 0 0 44px rgba(124,58,237,.18);
+      filter: saturate(1.2) contrast(1.12) brightness(1.08);
+    }
+    .drum-row.stop-glitch::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,77,46,.16), rgba(225,29,72,.10), rgba(124,58,237,.14)),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0px, rgba(255,255,255,.04) 2px, rgba(0,0,0,0) 6px, rgba(0,0,0,0) 10px);
+      mix-blend-mode: screen;
+      opacity:.0;
+      animation: stopGlitchFlicker .5s steps(6) both;
+    }
+    @keyframes stopGlitchMove{
+      0%   { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+      10%  { transform: translate3d(-6px, 3px,0) rotate(-0.7deg) scale(1.01); }
+      20%  { transform: translate3d(5px, -4px,0) rotate(0.8deg) scale(1.015); }
+      30%  { transform: translate3d(-4px, -2px,0) rotate(-0.5deg) scale(1.01); }
+      45%  { transform: translate3d(7px, 4px,0) rotate(0.6deg) scale(1.02); }
+      60%  { transform: translate3d(-3px, 2px,0) rotate(-0.4deg) scale(1.01); }
+      75%  { transform: translate3d(4px, -3px,0) rotate(0.5deg) scale(1.015); }
+      100% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+    }
+    @keyframes stopGlitchFlicker{
+      0%   { opacity: 0; transform: translate3d(0,0,0); filter: hue-rotate(0deg); }
+      12%  { opacity: .85; transform: translate3d(-2%,0,0); }
+      24%  { opacity: .35; transform: translate3d(2%,-1%,0); }
+      36%  { opacity: .95; transform: translate3d(-3%,1%,0); filter: hue-rotate(25deg); }
+      50%  { opacity: .25; transform: translate3d(3%,0,0); }
+      66%  { opacity: .9; transform: translate3d(-1%,1%,0); filter: hue-rotate(-18deg); }
+      82%  { opacity: .4; transform: translate3d(2%,-1%,0); }
+      100% { opacity: 0; transform: translate3d(0,0,0); filter: hue-rotate(0deg); }
+    }
     .drum-row::before{
       content:"";
       position:absolute;
@@ -575,6 +613,7 @@
             <img id="preview-image" src="" alt="Historia aleatoria" />
           </div>
           <div class="drum-info">
+            <div class="label" id="preview-label" hidden>Te ha tocado la siguiente Story:</div>
             <div id="preview-title">Cargando…</div>
             <div id="preview-subtitle">Pulsa «Girar» para empezar.</div>
           </div>
@@ -594,7 +633,6 @@
           <div class="selected-inner">
             <img id="selected-image" src="" alt="Historia seleccionada" />
             <div class="selected-content">
-              <div class="label" id="selected-label">Te ha tocado la siguiente Story:</div>
               <h3 id="selected-title"></h3>
               <div id="selected-meta"></div>
               <p id="selected-synopsis"></p>
@@ -661,6 +699,7 @@ function playRouletteStopOnce(){
     const previewImgEl = document.getElementById("preview-image");
     const previewTitleEl = document.getElementById("preview-title");
     const previewSubtitleEl = document.getElementById("preview-subtitle");
+    const previewLabelEl = document.getElementById("preview-label");
     const spinBtn = document.getElementById("spin-toggle-button");
     const spinLabelEl = document.getElementById("spin-toggle-label");
     const categorySelectEl = document.getElementById("category-select");
@@ -726,6 +765,11 @@ function stopSpinning(){
       setSpinButtonState(false);
       previewSubtitleEl.textContent = "Pulsa «Girar» para otra story.";
       drumRowEl.classList.remove("spinning");
+      // v_2: efecto luminoso + glitch al detener (0.5s)
+      drumRowEl.classList.remove("stop-glitch");
+      void drumRowEl.offsetWidth; // reflow para reiniciar animación
+      drumRowEl.classList.add("stop-glitch");
+      setTimeout(() => drumRowEl.classList.remove("stop-glitch"), 520);
 
       if (intervalId) {
         clearInterval(intervalId);
@@ -737,6 +781,7 @@ function stopSpinning(){
       playRouletteStopOnce();
 
       const story = stories[currentIndex];
+      if (previewLabelEl) previewLabelEl.hidden = false;
       updatePreview(story);
       showSelectedStory(story);
     }
@@ -749,6 +794,7 @@ function stopSpinning(){
       setSpinButtonState(true);
       setSpinButtonState(true);
       selectedBoxEl.classList.add("hidden");
+      if (previewLabelEl) previewLabelEl.hidden = true;
       previewSubtitleEl.textContent = "La ruleta está girando…";
       drumRowEl.classList.add("spinning");
 
@@ -814,7 +860,7 @@ function stopSpinning(){
       if (currentCategory === "all") {
         stories = allStories.slice();
       } else if (currentCategory === "GRATIS") {
-        stories = allStories.filter(story => story.isFree === true);
+        stories = allStories.filter(story => String(story.tipo || "").trim().toUpperCase() === "GRATIS");
       } else {
         stories = allStories.filter(story => (story.categories || []).includes(currentCategory));
       }
@@ -833,6 +879,7 @@ function stopSpinning(){
       setSpinButtonState(false);
       selectedBoxEl.classList.add("hidden");
 
+      if (previewLabelEl) previewLabelEl.hidden = true;
       setRandomPreviewOnLoad();  // SIEMPRE random al cargar o cambiar categoría
       updateStatus();
     }
@@ -860,10 +907,8 @@ function stopSpinning(){
             image: IMAGE_BASE_PATH + id + ".jpg",
             url: STORY_URL_BASE + id + ".html",
             book: item.book ?? item.bookNum ?? item.booknum ?? item.book_number ?? item["Book#"] ?? item["book#"] ?? "",
-            isFree: (
-              item.gratis === true || item.GRATIS === true || item.free === true || item.Free === true ||
-              ["GRATIS","SI","SÍ","YES","TRUE","1"].includes(String(item.gratis ?? item.GRATIS ?? item.free ?? item.Free ?? "").toUpperCase().trim())
-            )
+            tipo: item.tipo ?? item.Tipo ?? item.TIPO ?? "",
+            isFree: (String(item.tipo ?? item.Tipo ?? item.TIPO ?? "").trim().toUpperCase() === "GRATIS")
           }))
           .filter(story => !story.date || story.date <= todayStr);
 
