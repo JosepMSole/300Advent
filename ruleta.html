@@ -594,7 +594,7 @@
           <div class="selected-inner">
             <img id="selected-image" src="" alt="Historia seleccionada" />
             <div class="selected-content">
-              <div class="label">Historia seleccionada</div>
+              <div class="label" id="selected-label">Te ha tocado la siguiente Story:</div>
               <h3 id="selected-title"></h3>
               <div id="selected-meta"></div>
               <p id="selected-synopsis"></p>
@@ -683,7 +683,7 @@ function playRouletteStopOnce(){
     function updatePreview(story){
       previewImgEl.src = story.image;
       previewImgEl.alt = story.title;
-      previewTitleEl.textContent = story.title + " (ID: " + story.id + ")";
+      previewTitleEl.textContent = story.title + " (#" + story.id + ")";
     }
 
     function pickRandomDifferentIndex(){
@@ -724,7 +724,7 @@ function stopSpinning(){
       spinBtn.disabled = false;
       setSpinButtonState(false);
       setSpinButtonState(false);
-      previewSubtitleEl.textContent = "Esta es la historia que ha tocado.";
+      previewSubtitleEl.textContent = "Pulsa «Girar» para otra story.";
       drumRowEl.classList.remove("spinning");
 
       if (intervalId) {
@@ -770,6 +770,11 @@ function stopSpinning(){
 
       if (story.year) metaParts.push('<span class="meta-pill">' + story.year + '</span>');
 
+      if (story.book !== undefined && story.book !== null && String(story.book).trim() !== "") {
+        const bookVal = String(story.book).replace(/^\s*Book#?/i, "").trim();
+        metaParts.push('<span class="meta-pill">' + "Book#" + bookVal + '</span>');
+      }
+
       if (story.categories && story.categories.length > 0) {
         story.categories.forEach(cat => {
           metaParts.push('<span class="meta-pill meta-tag">' + cat + '</span>');
@@ -795,6 +800,12 @@ function stopSpinning(){
         opt.textContent = cat;
         categorySelectEl.appendChild(opt);
       });
+
+      // Categoría especial: GRATIS (no viene de story.categories, se valida con metadato)
+      const freeOpt = document.createElement("option");
+      freeOpt.value = "GRATIS";
+      freeOpt.textContent = "GRATIS";
+      categorySelectEl.appendChild(freeOpt);
     }
 
     function applyCategoryFilter(){
@@ -802,6 +813,8 @@ function stopSpinning(){
 
       if (currentCategory === "all") {
         stories = allStories.slice();
+      } else if (currentCategory === "GRATIS") {
+        stories = allStories.filter(story => story.isFree === true);
       } else {
         stories = allStories.filter(story => (story.categories || []).includes(currentCategory));
       }
@@ -845,7 +858,12 @@ function stopSpinning(){
             categories: Array.isArray(item.categorias) ? item.categorias : [],
             date: item.fecha || "",
             image: IMAGE_BASE_PATH + id + ".jpg",
-            url: STORY_URL_BASE + id + ".html"
+            url: STORY_URL_BASE + id + ".html",
+            book: item.book ?? item.bookNum ?? item.booknum ?? item.book_number ?? item["Book#"] ?? item["book#"] ?? "",
+            isFree: (
+              item.gratis === true || item.GRATIS === true || item.free === true || item.Free === true ||
+              ["GRATIS","SI","SÍ","YES","TRUE","1"].includes(String(item.gratis ?? item.GRATIS ?? item.free ?? item.Free ?? "").toUpperCase().trim())
+            )
           }))
           .filter(story => !story.date || story.date <= todayStr);
 
